@@ -1,7 +1,5 @@
 # Span-based Classifier for Short Answer Scoring and Beyond
 
-Masterarbeit von Malaz al Mahdi, eingereicht am Lehr- und Forschungsgebiet Educational Technologies am DIPF (Goethe-Universität Frankfurt). Erstgutachter: Prof. Dr. Hendrik Drachsler, Betreuung: Zhifan Sun (DIPF).
-
 Dieses Repository enthält die Arbeit als PDF und die Ergebnisse **aller 166 Trainingsläufe**, auf denen Kapitel 5 beruht.
 
 ## Inhalt
@@ -93,9 +91,3 @@ Gleiche Saat und gleiche Softwareumgebung liefern byteweise identische Ergebniss
 | **Summe** | **30** | **63** | **73** |
 
 Die README jedes Benchmarks erklärt jeden einzelnen Lauf: welche Frage er beantwortet, wie er gegenüber seiner Referenz abschneidet und was die Drei-Saat-Vergleiche daraus ergeben.
-
-## Nicht enthalten
-
-- **Modellgewichte.** Die LoRA-Adapter sind je rund 180 MB groß und überschreiten die Dateigrenze von GitHub.
-- **Archive vom Rechenserver.** Sie enthalten dieselben Läufe noch einmal. Nicht übernommen sind dabei zwei frühere Versuche, die in der Arbeit nicht ausgewertet werden.
-- **Zwischenstände (Checkpoints)** einzelner Läufe.
