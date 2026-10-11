@@ -6,7 +6,7 @@ Der einzige Benchmark mit **allen drei** Generalisierungsbedingungen. Die 46 Fra
 
 **Umfang:** 4.969 Trainingsinstanzen; UA 540, UQ 733, UD 4.562
 
-Insgesamt liegen hier **73 Trainingsläufe**.
+Insgesamt liegen hier **83 Trainingsläufe**.
 
 ## Was die Ergebnisse aussagen
 
@@ -15,11 +15,11 @@ Die folgenden Aussagen stützen sich, wo nicht anders vermerkt, auf Mittelwerte 
 - **Aufgabenbezogene Information ist der bestimmende Faktor.** Ohne Rubrik und ohne Kontext fällt der feste Kopf um 0,235 / 0,520 / 0,361 QWK (1B) und 0,255 / 0,528 / 0,440 (3B). Auf UQ und UD liegt die Leistung dann auf oder unter dem Zufallsniveau. Dieser Befund gilt unter beiden Metriken.
 - **Frage und Musterlösung ersetzen die Rubrik.** Kontext allein übertrifft Rubrik allein um 0,100 / 0,060 / 0,077 QWK. Unter Macro-F1 gilt das nur auf UA; auf UQ und UD macht Kontext das Modell vor allem seltener grob falsch: Weite Fehler (incorrect ↔ correct) sinken von rund 11 % auf rund 7 % der Instanzen.
 - **Die Rubrik bringt bei vorhandenem Kontext unter QWK nichts** (−0,012 / +0,015 / +0,006). Unter Macro-F1 trägt sie auf UD etwas bei (+0,029, Effekt).
-- **Die Fusionsmechanismen sind nicht zu unterscheiden.** Unter keiner der beiden Metriken ist ein Unterschied als Effekt nachweisbar; auf Llama-3.2-3B liegt GATE nominell auf allen drei Splits vorn.
+- **Die Fusionsmechanismen sind nicht zu unterscheiden** — auf keinem der drei Backbones und unter keiner der beiden Metriken. Auf Llama-3.2-3B liegt GATE nominell auf allen drei Splits vorn; bei Mistral-7B liegen die Varianten auf UA im Mittel nur 0,009 QWK auseinander, und die Rangfolge wechselt.
 - **Span-Alignment gegen festen Kopf: kleiner Vorteil nur bei 1B.** Auf UA (+0,021) und UD (+0,026) besteht der Vorteil die Auswertungsregel, liegt aber unter der Rauschgrenze; bei 3B ist kein Unterschied nachweisbar.
 - **Die Bezugsgröße ist ohne Wirkung.** t-concat und CONCAT liegen auf allen drei Splits innerhalb ihrer Spannweiten. Mit nur der Saat 114514 hätte t-concat einen deutlichen Vorteil nahegelegt.
 - **Vollständige Bidirektionalität nützt dem größeren Backbone auf UQ.** Llama-3.2-3B gewinnt 0,060 QWK auf UQ (Effekt unter beiden Metriken); bei Llama-3.2-1B ist kein Unterschied nachweisbar.
-- **Die höhere Lernrate hilft hier nicht.** Llama-3.2-1B bei 2·10⁻⁴ liegt auf UA und UD unter allen Läufen bei 5·10⁻⁵ (0,679 / 0,496 QWK).
+- **Die höhere Lernrate hilft hier nicht.** Llama-3.2-1B bei 2·10⁻⁴ liegt auf UA und UD unter allen Läufen bei 5·10⁻⁵ (0,679 / 0,496 QWK). Llama-3.2-3B liegt bei 2·10⁻⁴ auf UQ über dem Bereich (+0,030), auf UD darunter (−0,041), auf UA innerhalb.
 - **Encoder sind auf diesem Benchmark fragil.** BERT liegt bei jeder geprüften Lernrate auf Zufallsniveau; RoBERTa funktioniert nur bei 1·10⁻⁵ und bleibt auch dann hinter Llama-3.2-1B.
 - **Die Bibliotheksversion ändert Ergebnisse messbar.** Bei gleicher Saat weichen `_tf4576` und `_tf5161` um +0,016 / −0,014 / −0,001 QWK ab.
 
@@ -45,6 +45,9 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 | fester Kopf, Rubrik | Llama-3.2-3B | 0,746 (0,028) | 0,725 (0,021) | 0,580 (0,076) | 0,633 (0,066) | 0,641 (0,026) | 0,646 (0,011) |
 | fester Kopf, weder Rubrik noch Kontext | Llama-3.2-3B | 0,491 (0,025) | 0,573 (0,027) | 0,052 (0,063) | 0,368 (0,027) | 0,201 (0,029) | 0,385 (0,035) |
 | t-concat, kausal | Llama-3.2-3B | 0,734 (0,066) | 0,721 (0,039) | 0,584 (0,059) | 0,649 (0,029) | 0,615 (0,019) | 0,657 (0,013) |
+| CONCAT, kausal | Mistral-7B | 0,750 (0,050) | 0,720 (0,034) | 0,652 (0,046) | 0,677 (0,040) | 0,647 (0,037) | 0,670 (0,025) |
+| CONDIFF, kausal | Mistral-7B | 0,755 (0,030) | 0,720 (0,020) | 0,639 (0,063) | 0,671 (0,048) | 0,641 (0,011) | 0,662 (0,014) |
+| GATE, kausal | Mistral-7B | 0,758 (0,014) | 0,730 (0,023) | 0,632 (0,015) | 0,688 (0,003) | 0,638 (0,031) | 0,665 (0,006) |
 
 ### Alle Vergleiche mit Urteil
 
@@ -52,67 +55,76 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 
 | Vergleich | Kapitel | Split | Δ QWK | Urteil QWK | Δ Macro-F1 | Urteil Macro-F1 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3 | UA | +0,235 | **Effekt** | +0,116 | **Effekt** |
-| Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3 | UQ | +0,520 | **Effekt** | +0,286 | **Effekt** |
-| Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3 | UD | +0,361 | **Effekt** | +0,249 | **Effekt** |
-| Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3 | UA | +0,255 | **Effekt** | +0,152 | **Effekt** |
-| Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3 | UQ | +0,528 | **Effekt** | +0,265 | **Effekt** |
-| Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3 | UD | +0,440 | **Effekt** | +0,260 | **Effekt** |
-| Kontext und Rubrik gegen nur Kontext (1B) | 5.3 | UA | −0,012 | — | −0,020 | — |
-| Kontext und Rubrik gegen nur Kontext (1B) | 5.3 | UQ | +0,015 | — | +0,019 | Hinweis |
-| Kontext und Rubrik gegen nur Kontext (1B) | 5.3 | UD | +0,006 | — | +0,029 | **Effekt** |
-| nur Kontext gegen nur Rubrik (1B) | 5.3 | UA | +0,100 | **Effekt** | +0,076 | **Effekt** |
-| nur Kontext gegen nur Rubrik (1B) | 5.3 | UQ | +0,060 | **Effekt** | −0,003 | — |
-| nur Kontext gegen nur Rubrik (1B) | 5.3 | UD | +0,077 | **Effekt** | +0,014 | Hinweis |
-| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3 | UA | +0,088 | **Effekt** | +0,055 | **Effekt** |
-| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3 | UQ | +0,075 | **Effekt** | +0,017 | — |
-| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3 | UD | +0,083 | **Effekt** | +0,043 | **Effekt** |
-| CONDIFF gegen CONCAT (1B) | 5.4 | UA | +0,004 | — | −0,004 | — |
-| CONDIFF gegen CONCAT (1B) | 5.4 | UQ | −0,025 | — | −0,009 | — |
-| CONDIFF gegen CONCAT (1B) | 5.4 | UD | −0,017 | — | −0,011 | Hinweis |
-| CONDIFF gegen GATE (1B) | 5.4 | UA | −0,016 | — | −0,015 | — |
-| CONDIFF gegen GATE (1B) | 5.4 | UQ | −0,020 | — | +0,012 | — |
-| CONDIFF gegen GATE (1B) | 5.4 | UD | ±0,000 | — | +0,008 | — |
-| CONCAT gegen GATE (1B) | 5.4 | UA | −0,020 | — | −0,012 | — |
-| CONCAT gegen GATE (1B) | 5.4 | UQ | +0,005 | — | +0,021 | — |
-| CONCAT gegen GATE (1B) | 5.4 | UD | +0,017 | — | +0,019 | Hinweis |
-| CONDIFF gegen CONCAT (3B) | 5.4 | UA | +0,014 | — | −0,001 | — |
-| CONDIFF gegen CONCAT (3B) | 5.4 | UQ | −0,006 | — | −0,007 | — |
-| CONDIFF gegen CONCAT (3B) | 5.4 | UD | −0,008 | — | −0,006 | — |
-| CONDIFF gegen DIFF (3B) | 5.4 | UA | +0,012 | — | +0,008 | — |
-| CONDIFF gegen DIFF (3B) | 5.4 | UQ | −0,003 | — | +0,002 | — |
-| CONDIFF gegen DIFF (3B) | 5.4 | UD | −0,006 | — | −0,004 | — |
-| CONDIFF gegen GATE (3B) | 5.4 | UA | −0,002 | — | −0,004 | — |
-| CONDIFF gegen GATE (3B) | 5.4 | UQ | −0,049 | Hinweis | −0,019 | — |
-| CONDIFF gegen GATE (3B) | 5.4 | UD | −0,013 | — | −0,004 | — |
-| CONCAT gegen DIFF (3B) | 5.4 | UA | −0,002 | — | +0,009 | — |
-| CONCAT gegen DIFF (3B) | 5.4 | UQ | +0,003 | — | +0,008 | — |
-| CONCAT gegen DIFF (3B) | 5.4 | UD | +0,002 | — | +0,002 | — |
-| CONCAT gegen GATE (3B) | 5.4 | UA | −0,016 | — | −0,003 | — |
-| CONCAT gegen GATE (3B) | 5.4 | UQ | −0,042 | — | −0,013 | — |
-| CONCAT gegen GATE (3B) | 5.4 | UD | −0,004 | — | +0,003 | — |
-| DIFF gegen GATE (3B) | 5.4 | UA | −0,014 | — | −0,012 | Hinweis |
-| DIFF gegen GATE (3B) | 5.4 | UQ | −0,046 | — | −0,021 | — |
-| DIFF gegen GATE (3B) | 5.4 | UD | −0,007 | — | +0,001 | — |
-| t-concat gegen CONCAT (3B) | 5.5 | UA | +0,013 | — | +0,007 | — |
-| t-concat gegen CONCAT (3B) | 5.5 | UQ | +0,002 | — | −0,003 | — |
-| t-concat gegen CONCAT (3B) | 5.5 | UD | −0,011 | — | −0,005 | — |
-| Span-Alignment gegen festen Kopf (1B) | 5.6 | UA | +0,021 | **Effekt** | +0,018 | **Effekt** |
-| Span-Alignment gegen festen Kopf (1B) | 5.6 | UQ | −0,011 | — | −0,036 | — |
-| Span-Alignment gegen festen Kopf (1B) | 5.6 | UD | +0,026 | **Effekt** | +0,026 | **Effekt** |
-| Span-Alignment gegen festen Kopf (3B) | 5.6 | UA | −0,011 | — | −0,013 | — |
-| Span-Alignment gegen festen Kopf (3B) | 5.6 | UQ | −0,004 | — | +0,011 | — |
-| Span-Alignment gegen festen Kopf (3B) | 5.6 | UD | −0,024 | — | +0,010 | — |
-| vollständig bidirektional gegen kausal (1B) | 5.7 | UA | −0,010 | — | +0,013 | — |
-| vollständig bidirektional gegen kausal (1B) | 5.7 | UQ | +0,009 | — | +0,022 | — |
-| vollständig bidirektional gegen kausal (1B) | 5.7 | UD | +0,028 | — | +0,031 | — |
-| vollständig bidirektional gegen kausal (3B) | 5.7 | UA | +0,032 | Hinweis | +0,011 | — |
-| vollständig bidirektional gegen kausal (3B) | 5.7 | UQ | +0,060 | **Effekt** | +0,052 | **Effekt** |
-| vollständig bidirektional gegen kausal (3B) | 5.7 | UD | +0,008 | — | +0,011 | — |
+| Span-Alignment gegen festen Kopf (1B) | 5.3.1 | UA | +0,021 | **Effekt** | +0,018 | **Effekt** |
+| Span-Alignment gegen festen Kopf (1B) | 5.3.1 | UQ | −0,011 | — | −0,036 | — |
+| Span-Alignment gegen festen Kopf (1B) | 5.3.1 | UD | +0,026 | **Effekt** | +0,026 | **Effekt** |
+| Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UA | −0,011 | — | −0,013 | — |
+| Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UQ | −0,004 | — | +0,011 | — |
+| Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UD | −0,024 | — | +0,010 | — |
+| Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UA | +0,235 | **Effekt** | +0,116 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UQ | +0,520 | **Effekt** | +0,286 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UD | +0,361 | **Effekt** | +0,249 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3.2 | UA | +0,255 | **Effekt** | +0,152 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3.2 | UQ | +0,528 | **Effekt** | +0,265 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3.2 | UD | +0,440 | **Effekt** | +0,260 | **Effekt** |
+| Kontext und Rubrik gegen nur Kontext (1B) | 5.3.2 | UA | −0,012 | — | −0,020 | — |
+| Kontext und Rubrik gegen nur Kontext (1B) | 5.3.2 | UQ | +0,015 | — | +0,019 | Hinweis |
+| Kontext und Rubrik gegen nur Kontext (1B) | 5.3.2 | UD | +0,006 | — | +0,029 | **Effekt** |
+| nur Kontext gegen nur Rubrik (1B) | 5.3.2 | UA | +0,100 | **Effekt** | +0,076 | **Effekt** |
+| nur Kontext gegen nur Rubrik (1B) | 5.3.2 | UQ | +0,060 | **Effekt** | −0,003 | — |
+| nur Kontext gegen nur Rubrik (1B) | 5.3.2 | UD | +0,077 | **Effekt** | +0,014 | Hinweis |
+| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3.2 | UA | +0,088 | **Effekt** | +0,055 | **Effekt** |
+| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3.2 | UQ | +0,075 | **Effekt** | +0,017 | — |
+| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3.2 | UD | +0,083 | **Effekt** | +0,043 | **Effekt** |
+| CONDIFF gegen CONCAT (1B) | 5.4.1 | UA | +0,004 | — | −0,004 | — |
+| CONDIFF gegen CONCAT (1B) | 5.4.1 | UQ | −0,025 | — | −0,009 | — |
+| CONDIFF gegen CONCAT (1B) | 5.4.1 | UD | −0,017 | — | −0,011 | Hinweis |
+| CONDIFF gegen GATE (1B) | 5.4.1 | UA | −0,016 | — | −0,015 | — |
+| CONDIFF gegen GATE (1B) | 5.4.1 | UQ | −0,020 | — | +0,012 | — |
+| CONDIFF gegen GATE (1B) | 5.4.1 | UD | ±0,000 | — | +0,008 | — |
+| CONCAT gegen GATE (1B) | 5.4.1 | UA | −0,020 | — | −0,012 | — |
+| CONCAT gegen GATE (1B) | 5.4.1 | UQ | +0,005 | — | +0,021 | — |
+| CONCAT gegen GATE (1B) | 5.4.1 | UD | +0,017 | — | +0,019 | Hinweis |
+| CONDIFF gegen CONCAT (3B) | 5.4.1 | UA | +0,014 | — | −0,001 | — |
+| CONDIFF gegen CONCAT (3B) | 5.4.1 | UQ | −0,006 | — | −0,007 | — |
+| CONDIFF gegen CONCAT (3B) | 5.4.1 | UD | −0,008 | — | −0,006 | — |
+| CONDIFF gegen DIFF (3B) | 5.4.1 | UA | +0,012 | — | +0,008 | — |
+| CONDIFF gegen DIFF (3B) | 5.4.1 | UQ | −0,003 | — | +0,002 | — |
+| CONDIFF gegen DIFF (3B) | 5.4.1 | UD | −0,006 | — | −0,004 | — |
+| CONDIFF gegen GATE (3B) | 5.4.1 | UA | −0,002 | — | −0,004 | — |
+| CONDIFF gegen GATE (3B) | 5.4.1 | UQ | −0,049 | Hinweis | −0,019 | — |
+| CONDIFF gegen GATE (3B) | 5.4.1 | UD | −0,013 | — | −0,004 | — |
+| CONCAT gegen DIFF (3B) | 5.4.1 | UA | −0,002 | — | +0,009 | — |
+| CONCAT gegen DIFF (3B) | 5.4.1 | UQ | +0,003 | — | +0,008 | — |
+| CONCAT gegen DIFF (3B) | 5.4.1 | UD | +0,002 | — | +0,002 | — |
+| CONCAT gegen GATE (3B) | 5.4.1 | UA | −0,016 | — | −0,003 | — |
+| CONCAT gegen GATE (3B) | 5.4.1 | UQ | −0,042 | — | −0,013 | — |
+| CONCAT gegen GATE (3B) | 5.4.1 | UD | −0,004 | — | +0,003 | — |
+| DIFF gegen GATE (3B) | 5.4.1 | UA | −0,014 | — | −0,012 | Hinweis |
+| DIFF gegen GATE (3B) | 5.4.1 | UQ | −0,046 | — | −0,021 | — |
+| DIFF gegen GATE (3B) | 5.4.1 | UD | −0,007 | — | +0,001 | — |
+| CONDIFF gegen CONCAT (7B) | 5.4.1 | UA | +0,005 | — | ±0,000 | — |
+| CONDIFF gegen CONCAT (7B) | 5.4.1 | UQ | −0,012 | — | −0,006 | — |
+| CONDIFF gegen CONCAT (7B) | 5.4.1 | UD | −0,006 | — | −0,009 | — |
+| CONDIFF gegen GATE (7B) | 5.4.1 | UA | −0,003 | — | −0,010 | — |
+| CONDIFF gegen GATE (7B) | 5.4.1 | UQ | +0,008 | — | −0,017 | — |
+| CONDIFF gegen GATE (7B) | 5.4.1 | UD | +0,004 | — | −0,003 | — |
+| CONCAT gegen GATE (7B) | 5.4.1 | UA | −0,009 | — | −0,010 | — |
+| CONCAT gegen GATE (7B) | 5.4.1 | UQ | +0,020 | — | −0,011 | — |
+| CONCAT gegen GATE (7B) | 5.4.1 | UD | +0,009 | — | +0,006 | — |
+| t-concat gegen CONCAT (3B) | 5.4.2 | UA | +0,013 | — | +0,007 | — |
+| t-concat gegen CONCAT (3B) | 5.4.2 | UQ | +0,002 | — | −0,003 | — |
+| t-concat gegen CONCAT (3B) | 5.4.2 | UD | −0,011 | — | −0,005 | — |
+| vollständig bidirektional gegen kausal (1B) | 5.4.3 | UA | −0,010 | — | +0,013 | — |
+| vollständig bidirektional gegen kausal (1B) | 5.4.3 | UQ | +0,009 | — | +0,022 | — |
+| vollständig bidirektional gegen kausal (1B) | 5.4.3 | UD | +0,028 | — | +0,031 | — |
+| vollständig bidirektional gegen kausal (3B) | 5.4.3 | UA | +0,032 | Hinweis | +0,011 | — |
+| vollständig bidirektional gegen kausal (3B) | 5.4.3 | UQ | +0,060 | **Effekt** | +0,052 | **Effekt** |
+| vollständig bidirektional gegen kausal (3B) | 5.4.3 | UD | +0,008 | — | +0,011 | — |
 
 ## Die Läufe im Einzelnen
 
-Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testsplit; Macro-F1 und Accuracy stehen in der `*_metrics.json` des Laufs. Die Spalte **Was der Lauf zeigt** nennt, welche Frage der Lauf beantwortet, und vergleicht ihn mit seiner Referenz bei gleicher Saat. Solche Einzelvergleiche sind gegen die Rauschgrenze von 0,037 QWK zu lesen; belastbar sind erst die Drei-Saat-Vergleiche oben.
+Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testsplit; Macro-F1 und Accuracy stehen in der `*_metrics.json` des Laufs. Die Spalte **Was der Lauf zeigt** nennt, welche Frage der Lauf beantwortet, und vergleicht ihn mit seiner Referenz bei gleicher Saat. Solche Einzelvergleiche sind gegen die Rauschgrenze von 0,036 QWK zu lesen; belastbar sind erst die Drei-Saat-Vergleiche oben.
 
 ### Llama-3.2-1B
 
@@ -125,12 +137,12 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `scientsbank_bidir10_llama1b` ¹ | CONDIFF, 1 Schicht bidirektional (ρ = 1,0) | 5e-5 ¹ | 114514 | 0,691 | 0,547 | 0,558 | Attention-Maske: 1 von 16 Schichten bidirektional, ρ = 1,0 (ρ = 1,0 bedeutet genau eine Schicht, nicht das volle Modell), Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_llama1b`: UA −0,014 · UQ −0,035 · UD −0,014 → im Rauschen. |
 | `scientsbank_bidirfull_llama1b` | CONDIFF, 16 Schichten bidirektional (ρ = L) | 5e-5 | 114514 | 0,675 | 0,498 | 0,560 | Attention-Maske: alle 16 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_llama1b`: UA −0,031 · UQ −0,084 · UD −0,012 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,692 (Δ 0,049) · UQ 0,553 (Δ 0,087) · UD 0,588 (Δ 0,046). **Schwächste der drei Saaten; der hier sichtbare Verlust bestätigt sich unter drei Saaten nicht.** |
 | `scientsbank_bidirfull_llama1b_seed1` | CONDIFF, 16 Schichten bidirektional (ρ = L) | 5e-5 | 1 | 0,723 | 0,576 | 0,606 | Attention-Maske: alle 16 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_llama1b_seed1`: UA +0,021 · UQ +0,048 · UD +0,060 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,692 (Δ 0,049) · UQ 0,553 (Δ 0,087) · UD 0,588 (Δ 0,046). |
-| `scientsbank_bidirfull_llama1b_seed2` | CONDIFF, 16 Schichten bidirektional (ρ = L) | 5e-5 | 2 | 0,679 | 0,585 | 0,597 | Attention-Maske: alle 16 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_llama1b_seed2`: UA −0,020 · UQ +0,062 · UD +0,036 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,692 (Δ 0,049) · UQ 0,553 (Δ 0,087) · UD 0,588 (Δ 0,046). |
+| `scientsbank_bidirfull_llama1b_seed2` | CONDIFF, 16 Schichten bidirektional (ρ = L) | 5e-5 | 2 | 0,679 | 0,585 | 0,597 | Attention-Maske: alle 16 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_llama1b_seed2`: UA −0,020 · UQ +0,062 · UD +0,036 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,692 (Δ 0,049) · UQ 0,553 (Δ 0,087) · UD 0,588 (Δ 0,046). |
 | `scientsbank_concat_llama1b` ¹ | CONCAT, kausal | 5e-5 ¹ | 114514 | 0,689 | 0,565 | 0,563 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama1b`: UA −0,016 · UQ −0,017 · UD −0,010 → im Rauschen. Drei-Saat-Mittel: UA 0,698 (Δ 0,034) · UQ 0,569 (Δ 0,043) · UD 0,577 (Δ 0,025). |
 | `scientsbank_concat_llama1b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,685 | 0,550 | 0,588 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama1b_seed1`: UA −0,017 · UQ +0,023 · UD +0,041 → über der Rauschgrenze auf UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,698 (Δ 0,034) · UQ 0,569 (Δ 0,043) · UD 0,577 (Δ 0,025). |
 | `scientsbank_concat_llama1b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,719 | 0,593 | 0,580 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama1b_seed2`: UA +0,020 · UQ +0,070 · UD +0,019 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,698 (Δ 0,034) · UQ 0,569 (Δ 0,043) · UD 0,577 (Δ 0,025). |
 | `scientsbank_condiff_llama1b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,705 | 0,582 | 0,572 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. Drei-Saat-Mittel: UA 0,702 (Δ 0,007) · UQ 0,544 (Δ 0,058) · UD 0,560 (Δ 0,026). |
-| `scientsbank_condiff_llama1b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,679 | 0,537 | 0,496 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `scientsbank_condiff_llama1b`: UA −0,027 · UQ −0,045 · UD −0,076 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Grundlage der Aussage, dass der Größenvergleich mit der Lernrate konfundiert ist (Kapitel 5.8). |
+| `scientsbank_condiff_llama1b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,679 | 0,537 | 0,496 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `scientsbank_condiff_llama1b`: UA −0,027 · UQ −0,045 · UD −0,076 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Grundlage der Aussage, dass der Größenvergleich mit der Lernrate konfundiert ist (Kapitel 5.4.4). |
 | `scientsbank_condiff_llama1b_seed1` | CONDIFF, kausal | 5e-5 | 1 | 0,703 | 0,527 | 0,546 | Wiederholung der CONDIFF-Referenz mit Saat 1. Drei-Saat-Mittel: UA 0,702 (Δ 0,007) · UQ 0,544 (Δ 0,058) · UD 0,560 (Δ 0,026). |
 | `scientsbank_condiff_llama1b_seed2` | CONDIFF, kausal | 5e-5 | 2 | 0,698 | 0,524 | 0,561 | Wiederholung der CONDIFF-Referenz mit Saat 2. Drei-Saat-Mittel: UA 0,702 (Δ 0,007) · UQ 0,544 (Δ 0,058) · UD 0,560 (Δ 0,026). |
 | `scientsbank_gate_llama1b` ¹ | GATE, kausal | 5e-5 ¹ | 114514 | 0,737 | 0,544 | 0,584 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama1b`: UA +0,032 · UQ −0,038 · UD +0,012 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,718 (Δ 0,039) · UQ 0,564 (Δ 0,032) · UD 0,559 (Δ 0,047). |
@@ -166,6 +178,7 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `scientsbank_concat_llama3b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,701 | 0,597 | 0,644 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama3b_seed1`: UA −0,049 · UQ +0,018 · UD +0,031 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,720 (Δ 0,042) · UQ 0,582 (Δ 0,049) · UD 0,626 (Δ 0,035). |
 | `scientsbank_concat_llama3b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,743 | 0,550 | 0,624 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama3b_seed2`: UA +0,040 · UQ −0,021 · UD −0,010 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,720 (Δ 0,042) · UQ 0,582 (Δ 0,049) · UD 0,626 (Δ 0,035). |
 | `scientsbank_condiff_llama3b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,750 | 0,576 | 0,605 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. Drei-Saat-Mittel: UA 0,734 (Δ 0,047) · UQ 0,576 (Δ 0,009) · UD 0,617 (Δ 0,028). |
+| `scientsbank_condiff_llama3b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,749 | 0,609 | 0,564 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `scientsbank_condiff_llama3b`: UA ±0,000 · UQ +0,033 · UD −0,041 → über der Rauschgrenze auf UD (Einzelvergleich). Gegenüber dem Drei-Saat-Bereich bei 5·10⁻⁵: UA innerhalb, UQ darüber (+0,030), UD darunter (−0,041) (Kapitel 5.4.4). |
 | `scientsbank_condiff_llama3b_seed1` | CONDIFF, kausal | 5e-5 | 1 | 0,750 | 0,580 | 0,614 | Wiederholung der CONDIFF-Referenz mit Saat 1. Drei-Saat-Mittel: UA 0,734 (Δ 0,047) · UQ 0,576 (Δ 0,009) · UD 0,617 (Δ 0,028). |
 | `scientsbank_condiff_llama3b_seed2` | CONDIFF, kausal | 5e-5 | 2 | 0,703 | 0,571 | 0,633 | Wiederholung der CONDIFF-Referenz mit Saat 2. Drei-Saat-Mittel: UA 0,734 (Δ 0,047) · UQ 0,576 (Δ 0,009) · UD 0,617 (Δ 0,028). |
 | `scientsbank_diff_llama3b` | DIFF, kausal | 5e-5 | 114514 | 0,716 | 0,559 | 0,634 | Fusionsmechanismus DIFF (Differenzterm z − r allein) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama3b`: UA −0,033 · UQ −0,017 · UD +0,029 → im Rauschen. Drei-Saat-Mittel: UA 0,722 (Δ 0,014) · UQ 0,579 (Δ 0,048) · UD 0,623 (Δ 0,018). |
@@ -190,9 +203,18 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | Lauf | Konfiguration | lr | Saat | UA | UQ | UD | Was der Lauf zeigt |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `scientsbank_bidir02_mistral7b` ¹ | CONDIFF, 6 Schichten bidirektional (ρ = 0,2) | 5e-5 ¹ | 114514 | 0,766 | 0,627 | 0,652 | Attention-Maske: 6 von 32 Schichten bidirektional, ρ = 0,2, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA +0,023 · UQ +0,005 · UD +0,017 → im Rauschen. |
-| `scientsbank_bidir06_mistral7b` ¹ | CONDIFF, 19 Schichten bidirektional (ρ = 0,6) | 5e-5 ¹ | 114514 | 0,650 | 0,378 | 0,393 | Attention-Maske: 19 von 32 Schichten bidirektional, ρ = 0,6, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA −0,093 · UQ −0,243 · UD −0,241 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). **Instabiler Lauf wie `beetle_bidir02_mistral7b`; von der Deutung ausgenommen.** |
+| `scientsbank_bidir06_mistral7b` ¹ | CONDIFF, 19 Schichten bidirektional (ρ = 0,6) | 5e-5 ¹ | 114514 | 0,650 | 0,378 | 0,393 | Attention-Maske: 19 von 32 Schichten bidirektional, ρ = 0,6, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA −0,093 · UQ −0,243 · UD −0,241 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). **Instabiler Lauf wie `beetle_bidir02_mistral7b`; von der Deutung ausgenommen.** Die Wiederholung `scientsbank_bidir06_mistral7b_v2` liegt im Bereich der übrigen Mistral-Läufe. |
+| `scientsbank_bidir06_mistral7b_v2` | CONDIFF, 19 Schichten bidirektional (ρ = 0,6) | 5e-5 | 114514 | 0,751 | 0,657 | 0,651 | Wiederholung des instabilen Laufs `scientsbank_bidir06_mistral7b` mit derselben Saat in neuerer Umgebung (transformers 4.57.6). Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA +0,008 · UQ +0,036 · UD +0,017 → im Rauschen. Der ursprüngliche Einbruch war kein Effekt der Maske (Kapitel 5.5.2). |
 | `scientsbank_bidir10_mistral7b` ¹ | CONDIFF, 1 Schicht bidirektional (ρ = 1,0) | 5e-5 ¹ | 114514 | 0,754 | 0,618 | 0,650 | Attention-Maske: 1 von 32 Schichten bidirektional, ρ = 1,0 (ρ = 1,0 bedeutet genau eine Schicht, nicht das volle Modell), Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA +0,011 · UQ −0,003 · UD +0,016 → im Rauschen. |
-| `scientsbank_condiff_mistral7b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,743 | 0,621 | 0,635 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. |
+| `scientsbank_concat_mistral7b` | CONCAT, kausal | 5e-5 | 114514 | 0,758 | 0,628 | 0,624 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b`: UA +0,014 · UQ +0,006 · UD −0,011 → im Rauschen. Drei-Saat-Mittel: UA 0,750 (Δ 0,050) · UQ 0,652 (Δ 0,046) · UD 0,647 (Δ 0,037). |
+| `scientsbank_concat_mistral7b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,721 | 0,673 | 0,657 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed1`: UA −0,028 · UQ −0,007 · UD +0,012 → im Rauschen. Drei-Saat-Mittel: UA 0,750 (Δ 0,050) · UQ 0,652 (Δ 0,046) · UD 0,647 (Δ 0,037). |
+| `scientsbank_concat_mistral7b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,771 | 0,654 | 0,661 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed2`: UA −0,002 · UQ +0,037 · UD +0,016 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,750 (Δ 0,050) · UQ 0,652 (Δ 0,046) · UD 0,647 (Δ 0,037). |
+| `scientsbank_condiff_mistral7b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,743 | 0,621 | 0,635 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. Drei-Saat-Mittel: UA 0,755 (Δ 0,030) · UQ 0,639 (Δ 0,063) · UD 0,641 (Δ 0,011). |
+| `scientsbank_condiff_mistral7b_seed1` | CONDIFF, kausal | 5e-5 | 1 | 0,749 | 0,680 | 0,645 | Wiederholung der CONDIFF-Referenz mit Saat 1. Drei-Saat-Mittel: UA 0,755 (Δ 0,030) · UQ 0,639 (Δ 0,063) · UD 0,641 (Δ 0,011). |
+| `scientsbank_condiff_mistral7b_seed2` | CONDIFF, kausal | 5e-5 | 2 | 0,773 | 0,617 | 0,645 | Wiederholung der CONDIFF-Referenz mit Saat 2. Drei-Saat-Mittel: UA 0,755 (Δ 0,030) · UQ 0,639 (Δ 0,063) · UD 0,641 (Δ 0,011). |
+| `scientsbank_gate_mistral7b` | GATE, kausal | 5e-5 | 114514 | 0,764 | 0,638 | 0,650 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b`: UA +0,021 · UQ +0,017 · UD +0,015 → im Rauschen. Drei-Saat-Mittel: UA 0,758 (Δ 0,014) · UQ 0,632 (Δ 0,015) · UD 0,638 (Δ 0,031). |
+| `scientsbank_gate_mistral7b_seed1` | GATE, kausal | 5e-5 | 1 | 0,761 | 0,634 | 0,645 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed1`: UA +0,012 · UQ −0,046 · UD ±0,000 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,758 (Δ 0,014) · UQ 0,632 (Δ 0,015) · UD 0,638 (Δ 0,031). |
+| `scientsbank_gate_mistral7b_seed2` | GATE, kausal | 5e-5 | 2 | 0,750 | 0,623 | 0,619 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed2`: UA −0,022 · UQ +0,006 · UD −0,026 → im Rauschen. Drei-Saat-Mittel: UA 0,758 (Δ 0,014) · UQ 0,632 (Δ 0,015) · UD 0,638 (Δ 0,031). |
 
 ### RoBERTa-base
 
@@ -249,15 +271,17 @@ Läufe der ersten Trainingswelle haben **keine** `config.json` und `training_arg
 | `seqclass_ctx` | fester Kopf **mit** Frage und Musterlösung in der Eingabe |
 | `seqclass_ctx_norub` | mit Frage und Musterlösung, aber ohne Rubriktexte |
 | `_seed1`, `_seed2` | Wiederholung mit anderer Zufallssaat; ohne Zusatz gilt die Referenzsaat 114514 |
+| `_seed3` … `_seed7` | Zusatzsaaten für CONDIFF mit Llama-3.2-1B auf Beetle, zur Prüfung der Rauschgrenze |
 | `_lr2e4` | abweichende Lernrate 2·10⁻⁴ statt der sonst durchgängigen 5·10⁻⁵ |
 | `_batch16_lr1e5` usw. | Encoder-Lernratenreihe: Batchgröße und Lernrate stehen im Namen |
 | `_tf4576`, `_tf5161` | Bibliotheksversion (transformers 4.57.6 bzw. 5.16.1) — nur dort vergeben, wo zwei Läufe sonst denselben Namen trügen |
-| `_v2` | Wiederholung desselben Laufs zur Prüfung der Reproduzierbarkeit |
+| `_v2` | Wiederholung desselben Laufs mit derselben Saat: zur Prüfung der Reproduzierbarkeit oder, bei Mistral-7B, eines instabilen Laufs |
+| `transfer_asap_condiff_*` | Training ausschließlich auf ASAP-SAS, Test auf Beetle und SciEntsBank (liegt unter `asap/`) |
 
 ## Bekannte Einschränkungen
 
 - **BERT scheitert auf diesem Benchmark vollständig**, bei allen geprüften Lernraten. Die Ursache ist ungeklärt.
 - **RoBERTa scheitert bei 2·10⁻⁵ und 5·10⁻⁵** (Accuracy unter der Mehrheitsschranke von 0,431).
-- **`scientsbank_bidir06_mistral7b`** fällt deutlich ab; vermutlich eine Trainingsinstabilität.
-- **Mistral-7B ist unvollständig:** Es fehlen `concat`, `gate`, `bidir04` und `bidir08`.
+- **`scientsbank_bidir06_mistral7b`** fällt deutlich ab (UQ 0,378). Die Wiederholung `_v2` erreicht 0,751 / 0,657 / 0,651; ob Umgebung oder Zufall den Einbruch verursacht hat, ist nicht trennbar, ein Maskeneffekt ist es nicht.
+- **Mistral-7B ist bei der Maske unvollständig:** Es fehlen `bidir04`, `bidir08` und `bidirfull`.
 - **Gemischte Softwareumgebungen:** In mehreren Drei-Saat-Gruppen stammt der Lauf mit Saat 114514 aus einer anderen Umgebung als die Saaten 1 und 2. Für den festen Kopf auf Llama-3.2-3B wird deshalb `_tf5161` verwendet. Details in Kapitel 5.2 der Arbeit.
