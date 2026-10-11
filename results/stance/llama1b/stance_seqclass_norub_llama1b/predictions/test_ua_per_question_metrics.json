@@ -1,0 +1,38 @@
+[
+    {
+        "question_id": "atheism",
+        "qwk": 0.5477271232155779,
+        "f1": 0.6677485729457056,
+        "accuracy": 0.7318181818181818
+    },
+    {
+        "question_id": "climate_change_is_a_real_concern",
+        "qwk": 0.4653976358288473,
+        "f1": 0.6698348522507594,
+        "accuracy": 0.8402366863905325
+    },
+    {
+        "question_id": "feminist_movement",
+        "qwk": 0.3776718437644164,
+        "f1": 0.6613071682839126,
+        "accuracy": 0.6666666666666666
+    },
+    {
+        "question_id": "hillary_clinton",
+        "qwk": 0.658635368020829,
+        "f1": 0.7874852497278128,
+        "accuracy": 0.8033898305084746
+    },
+    {
+        "question_id": "legalization_of_abortion",
+        "qwk": 0.47849890848608745,
+        "f1": 0.6443578818210086,
+        "accuracy": 0.6821428571428572
+    },
+    {
+        "question_id": "average",
+        "qwk": 0.5055861758631516,
+        "f1": 0.6861467450058398,
+        "accuracy": 0.7448508445053426
+    }
+]

@@ -1,6 +1,6 @@
 # Span-based Classifier for Short Answer Scoring and Beyond
 
-Dieses Repository enthält die Arbeit als PDF (deutsche und englische Fassung) und die Ergebnisse **aller 209 Trainingsläufe**, auf denen Kapitel 5 beruht.
+Dieses Repository enthält die Arbeit als PDF (deutsche und englische Fassung) und die Ergebnisse **aller 224 Trainingsläufe**, auf denen Kapitel 5 beruht.
 
 ## Inhalt
 
@@ -10,8 +10,9 @@ main_en.pdf              Die Masterarbeit (englische Fassung)
 results/
 ├── alle_metriken.csv    QWK, Macro-F1 und Accuracy aller Läufe und Splits in einer Tabelle
 ├── asap/                 46 Läufe, ASAP-SAS, inkl. 7 Transferläufe (README mit Erklärung jedes Laufs)
-├── beetle/               80 Läufe, Beetle (README mit Erklärung jedes Laufs)
+├── beetle/               86 Läufe, Beetle (README mit Erklärung jedes Laufs)
 ├── scientsbank/          83 Läufe, SciEntsBank (README mit Erklärung jedes Laufs)
+├── stance/                9 Läufe, Stance Detection, SemEval-2016 Task 6 (RQ3)
 └── logs/                 Trainingslogs und Softwareversionen der Nachtrainings
 ```
 
@@ -19,7 +20,7 @@ results/
 
 Die Arbeit untersucht die automatische Bewertung kurzer Schülerantworten (Automatic Short Answer Grading, ASAG) mit Decoder-Sprachmodellen. Grundlage ist RUSPAN: Das Modell liest Antwort und Rubriktexte in einer Sequenz, extrahiert die Rubrikstufen als Spans und bewertet die Antwort durch den Abgleich mit jeder Stufe. Dadurch kann dasselbe Modell Aufgaben mit unterschiedlich vielen Bewertungsstufen verarbeiten.
 
-Kapitel 5 folgt zwei Forschungsfragen. **RQ1:** Übertrifft der span-basierte Klassifikator die Vergleichsbedingungen? **RQ2:** Lassen sich Decoder-only-Sprachmodelle an ihn anpassen?
+Kapitel 5 folgt drei Forschungsfragen. **RQ1:** Übertrifft der span-basierte Klassifikator die Vergleichsbedingungen? **RQ2:** Lassen sich Decoder-only-Sprachmodelle an ihn anpassen? **RQ3:** Lässt er sich auf eine andere Sequenzklassifikationsaufgabe übertragen?
 
 | Achse | Ausprägungen | Kapitel |
 | --- | --- | --- |
@@ -31,6 +32,7 @@ Kapitel 5 folgt zwei Forschungsfragen. **RQ1:** Übertrifft der span-basierte Kl
 | Bezugsgröße der Fusion | Sequenzrepräsentation oder Antwort-Span | 5.4.2 |
 | Attention-Maske | kausal, anteilig oder vollständig bidirektional | 5.4.3 |
 | Backbone und Lernrate | Llama-3.2-1B, Llama-3.2-3B, Mistral-7B; 5·10⁻⁵ und 2·10⁻⁴ | 5.4.4 |
+| Andere Aufgabe (RQ3) | Stance Detection: Span-Alignment, fester Kopf mit und ohne Klassenbeschreibungen | 5.6 |
 
 ## Die wichtigsten Ergebnisse
 
@@ -39,9 +41,10 @@ Kapitel 5 folgt zwei Forschungsfragen. **RQ1:** Übertrifft der span-basierte Kl
 3. **Strukturelle Übertragbarkeit ist keine inhaltliche.** Auf ASAP-SAS trainiert, lässt sich das Modell ohne Anpassung auf Beetle und SciEntsBank anwenden, erreicht dort aber auf allen drei Backbones nur Zufallsniveau und ordnet fast jede Antwort der untersten Stufe zu.
 4. **Die Ausgestaltung der Fusion ist ohne nachweisbare Wirkung** — auf allen drei Backbones. Zwischen CONDIFF, CONCAT, DIFF und GATE und zwischen den beiden Bezugsgrößen ist kein Unterschied als Effekt nachweisbar.
 5. **Die Attention-Maske wirkt, aber mit wechselndem Vorzeichen.** Vollständige Bidirektionalität kostet Llama-3.2-3B auf Beetle 0,186 QWK auf neuen Fragen und bringt ihm auf SciEntsBank 0,060; auf ASAP-SAS ist sie bei beiden Llama-Größen ohne Wirkung.
-6. **Über die Modellgröße ist keine Aussage möglich.** Die kleinen Backbones liefen bei einem Viertel ihrer vorgesehenen Lernrate. Bei der passenden Rate liegt Llama-3.2-1B auf Beetle gleichauf mit dem Mittel über drei Mistral-7B-Läufe.
+6. **Über die Modellgröße ist keine sichere Aussage möglich.** Die kleinen Backbones liefen bei einem Viertel ihrer vorgesehenen Lernrate. Bei der passenden Rate ist der Vorsprung von Mistral-7B auf Beetle nicht mehr nachweisbar, der Effekt der Lernrate selbst aber auch nicht: Ein Einzellauf schien den Abstand vollständig zu schließen, mit drei Saaten wächst vor allem die Streuung.
 7. **Der Evaluationssplit entscheidet über die Schlussfolgerung.** Auf bekannten Fragen sind Encoder konkurrenzfähig, auf neuen Fragen liegt Llama-3.2-1B um 0,221 QWK vor RoBERTa.
 8. **Die Aufgabe wirkt stärker als jede Architekturvariante.** Auf ASAP-SAS reicht das QWK je Einzelaufgabe von 0,625 bis 0,898.
+9. **Das Verfahren lässt sich auf Stance Detection übertragen (RQ3).** Auf bekannten Targets schlägt das Span-Alignment den festen Kopf um 0,026 Macro-F1 (Effekt unter allen Metriken). Auf einem ungesehenen Target entscheiden die Klassenbeschreibungen: Ohne sie fällt der feste Kopf um 0,199 Macro-F1 zurück; die Übertragung bleibt insgesamt schwach.
 
 ## Wie die Ergebnisse zu lesen sind
 
@@ -53,7 +56,7 @@ Kapitel 5 folgt zwei Forschungsfragen. **RQ1:** Übertrifft der span-basierte Kl
 | **UQ** (Unseen Questions) | die Frage, gleiche Domäne | Hat es das Bewertungsprinzip von der Einzelfrage gelöst? |
 | **UD** (Unseen Domains) | Frage und Fachgebiet | Überträgt sich das Gelernte auf neue Inhalte? |
 
-ASAP-SAS stellt nur UA bereit, Beetle UA und UQ, SciEntsBank alle drei. Die Transferläufe werden auf den Splits von Beetle und SciEntsBank ausgewertet; in `alle_metriken.csv` steht ihr Split deshalb als `beetle_ua`, `scientsbank_uq` usw.
+ASAP-SAS stellt nur UA bereit, Beetle UA und UQ, SciEntsBank alle drei. Bei Stance Detection entspricht UA den fünf Trainings-Targets und UQ dem ungesehenen Target *Donald Trump*. Die Transferläufe werden auf den Splits von Beetle und SciEntsBank ausgewertet; in `alle_metriken.csv` steht ihr Split deshalb als `beetle_ua`, `scientsbank_uq` usw.
 
 ### Kennzahlen
 
@@ -63,12 +66,12 @@ ASAP-SAS stellt nur UA bereit, Beetle UA und UQ, SciEntsBank alle drei. Die Tran
 
 ### Rauschgrenze
 
-Viele Konfigurationen wurden mit drei Zufallssaaten wiederholt (114514, 1 und 2). Über 93 solcher Zellen aus 39 Gruppen schwankt das Ergebnis allein durch die Saat um:
+Viele Konfigurationen wurden mit drei Zufallssaaten wiederholt (114514, 1 und 2). Über 99 solcher ASAG-Zellen aus 42 Gruppen schwankt das Ergebnis allein durch die Saat um:
 
 | Kennwert | Spannweite über drei Saaten |
 | --- | --- |
 | Median | 0,036 QWK |
-| Mittelwert | 0,037 QWK |
+| Mittelwert | 0,038 QWK |
 | Minimum | 0,004 QWK |
 | Maximum | 0,118 QWK |
 
@@ -83,20 +86,21 @@ Gleiche Saat und gleiche Softwareumgebung liefern byteweise identische Ergebniss
 | Benchmark | Llama-3.2-1B | Llama-3.2-3B | Mistral-7B | Encoder | Summe |
 | --- | --- | --- | --- | --- | --- |
 | [ASAP-SAS](results/asap/README.md) | 17 | 17 | 10 | 2 | **46** |
-| [Beetle](results/beetle/README.md) | 35 | 27 | 13 | 5 | **80** |
+| [Beetle](results/beetle/README.md) | 41 | 27 | 13 | 5 | **86** |
 | [SciEntsBank](results/scientsbank/README.md) | 31 | 31 | 13 | 8 | **83** |
-| | | | | | **209** |
+| [Stance Detection](results/stance/README.md) | 9 | 0 | 0 | 0 | **9** |
+| | | | | | **224** |
 
-| Variante | ASAP | Beetle | SciEntsBank |
-| --- | --- | --- | --- |
-| `condiff` (inkl. Encoder, Lernratenvarianten und Zusatzsaaten) | 9 | 22 | 19 |
-| `concat` | 3 | 9 | 9 |
-| `diff` | 0 | 3 | 3 |
-| `gate` | 3 | 9 | 9 |
-| `tconcat` | 2 | 4 | 4 |
-| `bidir*` (alle Maskenstufen inkl. Wiederholungen `_v2`) | 22 | 20 | 20 |
-| `seqclass` (alle vier Varianten) | **0** | **13** | **19** |
-| `transfer` (Training ASAP-SAS, Test Beetle und SciEntsBank) | 7 | 0 | 0 |
-| **Summe** | **46** | **80** | **83** |
+| Variante | ASAP | Beetle | SciEntsBank | Stance |
+| --- | --- | --- | --- | --- |
+| `condiff` (inkl. Encoder, Lernratenvarianten und Zusatzsaaten) | 9 | 24 | 19 | 3 |
+| `concat` | 3 | 9 | 9 | 0 |
+| `diff` | 0 | 3 | 3 | 0 |
+| `gate` | 3 | 9 | 9 | 0 |
+| `tconcat` | 2 | 4 | 4 | 0 |
+| `bidir*` (alle Maskenstufen inkl. Wiederholungen `_v2`) | 22 | 20 | 20 | 0 |
+| `seqclass` (alle Varianten) | **0** | **17** | **19** | 6 |
+| `transfer` (Training ASAP-SAS, Test Beetle und SciEntsBank) | 7 | 0 | 0 | 0 |
+| **Summe** | **46** | **86** | **83** | **9** |
 
 Die README jedes Benchmarks erklärt jeden einzelnen Lauf: welche Frage er beantwortet, wie er gegenüber seiner Referenz abschneidet und was die Drei-Saat-Vergleiche daraus ergeben.

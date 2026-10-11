@@ -6,26 +6,26 @@ Erklärungs- und Definitionsfragen aus der elementaren Elektrizitätslehre — e
 
 **Umfang:** 3.941 Trainingsinstanzen; UA 439, UQ 819
 
-Insgesamt liegen hier **80 Trainingsläufe**.
+Insgesamt liegen hier **86 Trainingsläufe**.
 
 ## Was die Ergebnisse aussagen
 
 Die folgenden Aussagen stützen sich, wo nicht anders vermerkt, auf Mittelwerte über drei Zufallssaaten. Ein Unterschied gilt als **Effekt**, wenn die Differenz der Mittelwerte die größere der beiden Spannweiten übersteigt, als **Hinweis**, wenn sich die Spannweiten nicht überlappen, die Differenz aber kleiner ist. Die Tabellen unten zeigen jedes Urteil unter QWK und unter Macro-F1.
 
 - **Ohne Aufgabeninformation generalisiert das Modell hier trotzdem.** Entzieht man die Rubriktexte, verliert der feste Kopf auf UA 0,054 QWK (Hinweis; unter Macro-F1 ein Effekt), auf UQ nichts (−0,001). Anders als auf SciEntsBank bleibt die Accuracy auf neuen Fragen klar über der Mehrheitsschranke. Vermutete Ursache ist die enge, homogene Domäne.
-- **Frage und Musterlösung wirken stärker als die Rubrik.** In Einzelläufen bringt der Aufgabenkontext +0,095 (UA) und +0,111 (UQ) QWK zusätzlich zur Rubrik und +0,211 / +0,157 ohne sie. Die Rubrik bringt bei vorhandenem Kontext nichts (−0,036 / −0,047, im Rauschen).
+- **Frage und Musterlösung wirken stärker als die Rubrik.** Mit drei Saaten bringt der Aufgabenkontext +0,120 (UA) und +0,102 (UQ) QWK zusätzlich zur Rubrik und +0,210 / +0,149 ohne sie; Kontext allein übertrifft Rubrik allein um +0,157 / +0,150. Alle diese Unterschiede sind unter beiden Metriken Effekte. Bei vorhandenem Kontext schadet die Rubrik sogar: −0,036 auf UA (Hinweis) und −0,048 auf UQ (Effekt unter QWK, Hinweis unter Macro-F1). Llama-3.2-1B mit Kontext ohne Rubrik erreicht im Mittel 0,797 / 0,606 QWK und liegt auf UQ gleichauf mit Mistral-7B (0,605).
 - **Span-Alignment schlägt den festen Kopf nur beim kleinen Backbone.** Mit Llama-3.2-1B liegt es auf UA um 0,088 QWK vorn (Effekt unter beiden Metriken, auch mit acht Saaten: +0,092). Mit Llama-3.2-3B ist kein Unterschied nachweisbar (+0,008 / +0,027); der feste Kopf streut dort stark (Spannweite 0,081 / 0,089).
 - **Die Fusionsmechanismen sind nicht zu unterscheiden** — auf keinem der drei Backbones. Unter QWK ist kein Unterschied zwischen CONDIFF, CONCAT, DIFF und GATE als Effekt nachweisbar. Einzige Ausnahme unter Macro-F1: GATE liegt auf Llama-3.2-3B auf UA vor DIFF, um nur 0,009. Bei Mistral-7B liegen die drei Varianten auf UA im Mittel nur 0,008 QWK auseinander; der einzige Hinweis (CONDIFF vor GATE auf UQ) entfällt unter Macro-F1.
 - **Der Antwort-Span als Bezugsgröße bringt höchstens wenig.** t-concat liegt auf UA 0,026 QWK vor CONCAT (Hinweis; unter Macro-F1 knapp ein Effekt), auf UQ gleichauf.
 - **Vollständige Bidirektionalität schadet dem größeren Backbone deutlich.** Llama-3.2-3B verliert 0,073 QWK auf UA und 0,186 auf UQ. Der Gewinn von Llama-3.2-1B auf UA (+0,036 mit drei Saaten) hält der Erweiterung der kausalen Referenz auf acht Saaten nicht stand (+0,033, nicht nachweisbar); auf UQ verliert es unter Macro-F1 (−0,041, auch mit acht Saaten ein Effekt).
-- **Die Lernrate war für Llama-3.2-1B zu niedrig.** Bei 2·10⁻⁴ erreicht es 0,779 / 0,605 QWK und liegt damit über allen drei Läufen bei 5·10⁻⁵ — und gleichauf mit dem Mittel über drei Mistral-7B-Läufe (0,779 / 0,605). Mit acht Saaten ist der UA-Zuwachs allerdings nicht gesichert (Saat 6 erreicht 0,781). Für Llama-3.2-3B bringt 2·10⁻⁴ auf UA +0,027 über den Bereich, auf UQ liegt der Lauf innerhalb.
+- **Die höhere Lernrate bringt keinen gesicherten Gewinn.** Ein Einzellauf von Llama-3.2-1B bei 2·10⁻⁴ (Saat 114514) erreichte 0,779 / 0,605 QWK und schien den Abstand zu Mistral-7B vollständig zu schließen. Mit drei Saaten liegt das Mittel bei 0,766 / 0,551, also nur +0,036 / +0,042 über 5·10⁻⁵ — wegen der stark wachsenden Streuung (Spannweite 0,071 / 0,097) nicht nachweisbar, unter keiner der beiden Metriken. Gegenüber Mistral-7B ist der Abstand bei 5·10⁻⁵ ein Effekt (0,050 / 0,095), bei 2·10⁻⁴ nicht mehr nachweisbar (0,013 / 0,053). Für Llama-3.2-3B liegt bei 2·10⁻⁴ nur ein Einzellauf vor: UA +0,027 über dem Bereich, UQ innerhalb.
 - **Drei Saaten können die Streuung unterschätzen.** Über acht Saaten beträgt die Spannweite von CONDIFF mit Llama-3.2-1B auf UA 0,079 statt 0,023 bei den drei ursprünglichen; der Median aller 56 Dreiergruppen (0,039 / 0,034) bestätigt dagegen die Rauschgrenze von 0,036 (Kapitel 5.2).
 - **RoBERTa bricht auf UQ ein, bei jeder Lernrate.** Auf UA erreicht es bis zu 0,768, auf UQ nur 0,288 bis 0,362, gegenüber 0,509 für Llama-3.2-1B.
 - **Training ist reproduzierbar.** Die beiden `_seed114514_v2`-Läufe stimmen exakt mit ihren Originalen überein.
 
 ### Drei-Saat-Gruppen
 
-Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht Saaten“ fasst alle acht CONDIFF-Läufe von Llama-3.2-1B zusammen.
+Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht Saaten“ fasst alle acht CONDIFF-Läufe von Llama-3.2-1B zusammen. „lr 2·10⁻⁴“ bezeichnet die Läufe bei der Referenzlernrate der Implementierung.
 
 | Gruppe | Backbone | UA QWK | UA F1 | UQ QWK | UQ F1 |
 | --- | --- | --- | --- | --- | --- |
@@ -36,6 +36,9 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | fester Kopf, Rubrik | Llama-3.2-1B | 0,641 (0,055) | 0,681 (0,020) | 0,456 (0,068) | 0,559 (0,041) |
 | fester Kopf, weder Rubrik noch Kontext | Llama-3.2-1B | 0,587 (0,011) | 0,641 (0,034) | 0,457 (0,037) | 0,561 (0,024) |
 | CONDIFF, kausal, acht Saaten | Llama-3.2-1B | 0,732 (0,079) | 0,742 (0,050) | 0,525 (0,073) | 0,601 (0,034) |
+| fester Kopf, Kontext und Rubrik | Llama-3.2-1B | 0,761 (0,037) | 0,751 (0,060) | 0,557 (0,033) | 0,636 (0,020) |
+| fester Kopf, nur Kontext | Llama-3.2-1B | 0,797 (0,025) | 0,779 (0,033) | 0,606 (0,009) | 0,656 (0,004) |
+| CONDIFF, kausal, lr 2·10⁻⁴ | Llama-3.2-1B | 0,766 (0,071) | 0,752 (0,040) | 0,551 (0,097) | 0,603 (0,028) |
 | CONDIFF, vollständig bidirektional | Llama-3.2-3B | 0,657 (0,061) | 0,697 (0,060) | 0,358 (0,094) | 0,526 (0,056) |
 | CONCAT, kausal | Llama-3.2-3B | 0,735 (0,042) | 0,737 (0,013) | 0,546 (0,046) | 0,602 (0,016) |
 | CONDIFF, kausal | Llama-3.2-3B | 0,730 (0,041) | 0,725 (0,025) | 0,544 (0,044) | 0,596 (0,027) |
@@ -61,6 +64,14 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UQ | +0,027 | — | +0,018 | — |
 | Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UA | +0,054 | Hinweis | +0,040 | **Effekt** |
 | Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UQ | −0,001 | — | −0,002 | — |
+| Kontext mit gegen ohne Rubrik (1B) | 5.3.2 | UA | −0,036 | Hinweis | −0,027 | — |
+| Kontext mit gegen ohne Rubrik (1B) | 5.3.2 | UQ | −0,048 | **Effekt** | −0,019 | Hinweis |
+| nur Kontext gegen nur Rubrik (1B) | 5.3.2 | UA | +0,157 | **Effekt** | +0,097 | **Effekt** |
+| nur Kontext gegen nur Rubrik (1B) | 5.3.2 | UQ | +0,150 | **Effekt** | +0,097 | **Effekt** |
+| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3.2 | UA | +0,120 | **Effekt** | +0,070 | **Effekt** |
+| Kontext und Rubrik gegen nur Rubrik (1B) | 5.3.2 | UQ | +0,102 | **Effekt** | +0,077 | **Effekt** |
+| nur Kontext gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UA | +0,210 | **Effekt** | +0,138 | **Effekt** |
+| nur Kontext gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UQ | +0,149 | **Effekt** | +0,095 | **Effekt** |
 | CONDIFF gegen CONCAT (1B) | 5.4.1 | UA | +0,005 | — | +0,006 | Hinweis |
 | CONDIFF gegen CONCAT (1B) | 5.4.1 | UQ | +0,006 | — | +0,005 | — |
 | CONDIFF gegen GATE (1B) | 5.4.1 | UA | +0,033 | — | +0,008 | — |
@@ -93,6 +104,8 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | vollständig bidirektional gegen kausal (3B) | 5.4.3 | UQ | −0,186 | **Effekt** | −0,070 | **Effekt** |
 | vollständig bidirektional gegen kausal (1B, acht Saaten) | 5.4.3 | UA | +0,033 | — | +0,012 | — |
 | vollständig bidirektional gegen kausal (1B, acht Saaten) | 5.4.3 | UQ | −0,032 | — | −0,038 | **Effekt** |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UA | +0,036 | — | +0,013 | — |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UQ | +0,042 | — | ±0,000 | — |
 
 ## Die Läufe im Einzelnen
 
@@ -114,7 +127,9 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `beetle_concat_llama1b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,715 | 0,494 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama1b_seed1`: UA −0,027 · UQ −0,017 → im Rauschen. Drei-Saat-Mittel: UA 0,725 (Δ 0,016) · UQ 0,503 (Δ 0,021). |
 | `beetle_concat_llama1b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,729 | 0,501 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama1b_seed2`: UA ±0,000 · UQ −0,044 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,725 (Δ 0,016) · UQ 0,503 (Δ 0,021). |
 | `beetle_condiff_llama1b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,696 | 0,532 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. |
-| `beetle_condiff_llama1b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,779 | 0,605 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `beetle_condiff_llama1b`: UA +0,083 · UQ +0,073 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Grundlage der Aussage, dass der Größenvergleich mit der Lernrate konfundiert ist (Kapitel 5.4.4). |
+| `beetle_condiff_llama1b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,779 | 0,605 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `beetle_condiff_llama1b`: UA +0,083 · UQ +0,073 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Grundlage der Aussage, dass der Größenvergleich mit der Lernrate konfundiert ist (Kapitel 5.4.4). Drei-Saat-Mittel: UA 0,766 (Δ 0,071) · UQ 0,551 (Δ 0,097). Mit drei Saaten ist der Vorsprung gegenüber 5·10⁻⁵ nicht mehr nachweisbar; der Einzellauf war der beste der drei. |
+| `beetle_condiff_llama1b_lr2e4_seed1` | CONDIFF, kausal | 2e-4 | 1 | 0,794 | 0,541 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 1. Gegenüber `beetle_condiff_llama1b_seed1`: UA +0,053 · UQ +0,030 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,766 (Δ 0,071) · UQ 0,551 (Δ 0,097). |
+| `beetle_condiff_llama1b_lr2e4_seed2` | CONDIFF, kausal | 2e-4 | 2 | 0,724 | 0,508 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 2. Gegenüber `beetle_condiff_llama1b_seed2`: UA −0,005 · UQ −0,037 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,766 (Δ 0,071) · UQ 0,551 (Δ 0,097). |
 | `beetle_condiff_llama1b_seed1` | CONDIFF, kausal | 5e-5 | 1 | 0,741 | 0,511 | Wiederholung der CONDIFF-Referenz mit Saat 1. Drei-Saat-Mittel: UA 0,729 (Δ 0,023) · UQ 0,509 (Δ 0,073). |
 | `beetle_condiff_llama1b_seed114514_verified` | CONDIFF, kausal | 5e-5 | 114514 | 0,718 | 0,472 | Wiederholung von `beetle_condiff_llama1b` mit derselben Saat, aber neuerer Softwareumgebung: UA +0,022 · UQ −0,060. Die Abweichung zeigt den Einfluss der Bibliotheksversion, nicht Zufall. Bildet mit `_seed1` und `_seed2` die Drei-Saat-Gruppe. Drei-Saat-Mittel: UA 0,729 (Δ 0,023) · UQ 0,509 (Δ 0,073). |
 | `beetle_condiff_llama1b_seed2` | CONDIFF, kausal | 5e-5 | 2 | 0,728 | 0,545 | Wiederholung der CONDIFF-Referenz mit Saat 2. Drei-Saat-Mittel: UA 0,729 (Δ 0,023) · UQ 0,509 (Δ 0,073). |
@@ -126,8 +141,12 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `beetle_gate_llama1b` ¹ | GATE, kausal | 5e-5 ¹ | 114514 | 0,695 | 0,497 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama1b`: UA −0,001 · UQ −0,035 → im Rauschen. Drei-Saat-Mittel: UA 0,696 (Δ 0,051) · UQ 0,471 (Δ 0,118). |
 | `beetle_gate_llama1b_seed1` | GATE, kausal | 5e-5 | 1 | 0,671 | 0,399 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama1b_seed1`: UA −0,070 · UQ −0,111 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,696 (Δ 0,051) · UQ 0,471 (Δ 0,118). |
 | `beetle_gate_llama1b_seed2` | GATE, kausal | 5e-5 | 2 | 0,722 | 0,517 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama1b_seed2`: UA −0,006 · UQ −0,028 → im Rauschen. Drei-Saat-Mittel: UA 0,696 (Δ 0,051) · UQ 0,471 (Δ 0,118). |
-| `beetle_seqclass_ctx_llama1b` | fester Kopf, kausal, mit Kontext | 5e-5 | 114514 | 0,764 | 0,554 | Frage und Musterlösung zusätzlich zu den Rubriktexten; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b`: UA +0,095 · UQ +0,111 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). |
-| `beetle_seqclass_ctx_norub_llama1b` | fester Kopf, kausal, ohne Rubrik, mit Kontext | 5e-5 | 114514 | 0,799 | 0,602 | Frage und Musterlösung statt der Rubriktexte; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b`: UA +0,131 · UQ +0,158 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). |
+| `beetle_seqclass_ctx_llama1b` | fester Kopf, kausal, mit Kontext | 5e-5 | 114514 | 0,764 | 0,554 | Frage und Musterlösung zusätzlich zu den Rubriktexten; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b`: UA +0,095 · UQ +0,111 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,761 (Δ 0,037) · UQ 0,557 (Δ 0,033). |
+| `beetle_seqclass_ctx_llama1b_seed1` | fester Kopf, kausal, mit Kontext | 5e-5 | 1 | 0,741 | 0,542 | Frage und Musterlösung zusätzlich zu den Rubriktexten; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b_seed1`: UA +0,101 · UQ +0,047 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,761 (Δ 0,037) · UQ 0,557 (Δ 0,033). |
+| `beetle_seqclass_ctx_llama1b_seed2` | fester Kopf, kausal, mit Kontext | 5e-5 | 2 | 0,779 | 0,575 | Frage und Musterlösung zusätzlich zu den Rubriktexten; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b_seed2`: UA +0,165 · UQ +0,147 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,761 (Δ 0,037) · UQ 0,557 (Δ 0,033). |
+| `beetle_seqclass_ctx_norub_llama1b` | fester Kopf, kausal, ohne Rubrik, mit Kontext | 5e-5 | 114514 | 0,799 | 0,602 | Frage und Musterlösung statt der Rubriktexte; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b`: UA +0,131 · UQ +0,158 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,797 (Δ 0,025) · UQ 0,606 (Δ 0,009). |
+| `beetle_seqclass_ctx_norub_llama1b_seed1` | fester Kopf, kausal, ohne Rubrik, mit Kontext | 5e-5 | 1 | 0,784 | 0,611 | Frage und Musterlösung statt der Rubriktexte; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b_seed1`: UA +0,144 · UQ +0,115 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,797 (Δ 0,025) · UQ 0,606 (Δ 0,009). |
+| `beetle_seqclass_ctx_norub_llama1b_seed2` | fester Kopf, kausal, ohne Rubrik, mit Kontext | 5e-5 | 2 | 0,809 | 0,604 | Frage und Musterlösung statt der Rubriktexte; fester Klassifikationskopf. Gegenüber Rubrik allein `beetle_seqclass_llama1b_seed2`: UA +0,195 · UQ +0,176 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,797 (Δ 0,025) · UQ 0,606 (Δ 0,009). |
 | `beetle_seqclass_llama1b` | fester Kopf, kausal | 5e-5 | 114514 | 0,669 | 0,443 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `beetle_condiff_llama1b`: UA −0,028 · UQ −0,089 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,641 (Δ 0,055) · UQ 0,456 (Δ 0,068). |
 | `beetle_seqclass_llama1b_seed1` | fester Kopf, kausal | 5e-5 | 1 | 0,640 | 0,496 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `beetle_condiff_llama1b_seed1`: UA −0,101 · UQ −0,015 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,641 (Δ 0,055) · UQ 0,456 (Δ 0,068). |
 | `beetle_seqclass_llama1b_seed114514_v2` | fester Kopf, kausal | 5e-5 | 114514 | 0,669 | 0,443 | Reproduktionsprüfung: Wiederholung von `beetle_seqclass_llama1b` mit identischer Saat und Umgebung. Alle Kennzahlen stimmen exakt überein, das Training ist deterministisch. |
