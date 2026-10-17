@@ -6,7 +6,7 @@ Erklärungs- und Definitionsfragen aus der elementaren Elektrizitätslehre — e
 
 **Umfang:** 3.941 Trainingsinstanzen; UA 439, UQ 819
 
-Insgesamt liegen hier **86 Trainingsläufe**.
+Insgesamt liegen hier **95 Trainingsläufe**.
 
 ## Was die Ergebnisse aussagen
 
@@ -14,12 +14,12 @@ Die folgenden Aussagen stützen sich, wo nicht anders vermerkt, auf Mittelwerte 
 
 - **Ohne Aufgabeninformation generalisiert das Modell hier trotzdem.** Entzieht man die Rubriktexte, verliert der feste Kopf auf UA 0,054 QWK (Hinweis; unter Macro-F1 ein Effekt), auf UQ nichts (−0,001). Anders als auf SciEntsBank bleibt die Accuracy auf neuen Fragen klar über der Mehrheitsschranke. Vermutete Ursache ist die enge, homogene Domäne.
 - **Frage und Musterlösung wirken stärker als die Rubrik.** Mit drei Saaten bringt der Aufgabenkontext +0,120 (UA) und +0,102 (UQ) QWK zusätzlich zur Rubrik und +0,210 / +0,149 ohne sie; Kontext allein übertrifft Rubrik allein um +0,157 / +0,150. Alle diese Unterschiede sind unter beiden Metriken Effekte. Bei vorhandenem Kontext schadet die Rubrik sogar: −0,036 auf UA (Hinweis) und −0,048 auf UQ (Effekt unter QWK, Hinweis unter Macro-F1). Llama-3.2-1B mit Kontext ohne Rubrik erreicht im Mittel 0,797 / 0,606 QWK und liegt auf UQ gleichauf mit Mistral-7B (0,605).
-- **Span-Alignment schlägt den festen Kopf nur beim kleinen Backbone.** Mit Llama-3.2-1B liegt es auf UA um 0,088 QWK vorn (Effekt unter beiden Metriken, auch mit acht Saaten: +0,092). Mit Llama-3.2-3B ist kein Unterschied nachweisbar (+0,008 / +0,027); der feste Kopf streut dort stark (Spannweite 0,081 / 0,089).
+- **Span-Alignment schlägt den festen Kopf nur beim kleinen Backbone.** Mit Llama-3.2-1B liegt es auf UA um 0,088 QWK vorn (Effekt unter beiden Metriken, auch mit acht Saaten: +0,092). Mit Llama-3.2-3B ist kein Unterschied nachweisbar (+0,008 / +0,027); der feste Kopf streut dort stark (Spannweite 0,081 / 0,089). Mit Mistral-7B ebenso wenig (−0,032 / +0,003); unter Macro-F1 liegt der feste Kopf auf UQ mit einem Hinweis vorn.
 - **Die Fusionsmechanismen sind nicht zu unterscheiden** — auf keinem der drei Backbones. Unter QWK ist kein Unterschied zwischen CONDIFF, CONCAT, DIFF und GATE als Effekt nachweisbar. Einzige Ausnahme unter Macro-F1: GATE liegt auf Llama-3.2-3B auf UA vor DIFF, um nur 0,009. Bei Mistral-7B liegen die drei Varianten auf UA im Mittel nur 0,008 QWK auseinander; der einzige Hinweis (CONDIFF vor GATE auf UQ) entfällt unter Macro-F1.
 - **Der Antwort-Span als Bezugsgröße bringt höchstens wenig.** t-concat liegt auf UA 0,026 QWK vor CONCAT (Hinweis; unter Macro-F1 knapp ein Effekt), auf UQ gleichauf.
-- **Vollständige Bidirektionalität schadet dem größeren Backbone deutlich.** Llama-3.2-3B verliert 0,073 QWK auf UA und 0,186 auf UQ. Der Gewinn von Llama-3.2-1B auf UA (+0,036 mit drei Saaten) hält der Erweiterung der kausalen Referenz auf acht Saaten nicht stand (+0,033, nicht nachweisbar); auf UQ verliert es unter Macro-F1 (−0,041, auch mit acht Saaten ein Effekt).
+- **Vollständige Bidirektionalität schadet den größeren Backbones.** Llama-3.2-3B verliert 0,073 QWK auf UA und 0,186 auf UQ, Mistral-7B 0,089 auf UQ (Effekt unter beiden Metriken); auf UA ist bei Mistral-7B unter QWK kein Unterschied nachweisbar (+0,023), unter Macro-F1 ein kleiner Gewinn (+0,017, Effekt). Der Gewinn von Llama-3.2-1B auf UA (+0,036 mit drei Saaten) hält der Erweiterung der kausalen Referenz auf acht Saaten nicht stand (+0,033, nicht nachweisbar); auf UQ verliert es unter Macro-F1 (−0,041, auch mit acht Saaten ein Effekt).
 - **Die höhere Lernrate bringt keinen gesicherten Gewinn.** Ein Einzellauf von Llama-3.2-1B bei 2·10⁻⁴ (Saat 114514) erreichte 0,779 / 0,605 QWK und schien den Abstand zu Mistral-7B vollständig zu schließen. Mit drei Saaten liegt das Mittel bei 0,766 / 0,551, also nur +0,036 / +0,042 über 5·10⁻⁵ — wegen der stark wachsenden Streuung (Spannweite 0,071 / 0,097) nicht nachweisbar, unter keiner der beiden Metriken. Gegenüber Mistral-7B ist der Abstand bei 5·10⁻⁵ ein Effekt (0,050 / 0,095), bei 2·10⁻⁴ nicht mehr nachweisbar (0,013 / 0,053). Für Llama-3.2-3B liegt bei 2·10⁻⁴ nur ein Einzellauf vor: UA +0,027 über dem Bereich, UQ innerhalb.
-- **Drei Saaten können die Streuung unterschätzen.** Über acht Saaten beträgt die Spannweite von CONDIFF mit Llama-3.2-1B auf UA 0,079 statt 0,023 bei den drei ursprünglichen; der Median aller 56 Dreiergruppen (0,039 / 0,034) bestätigt dagegen die Rauschgrenze von 0,036 (Kapitel 5.2).
+- **Drei Saaten können die Streuung unterschätzen.** Über acht Saaten beträgt die Spannweite von CONDIFF mit Llama-3.2-1B auf UA 0,079 statt 0,023 bei den drei ursprünglichen; der Median aller 56 Dreiergruppen (0,039 / 0,034) bestätigt dagegen die Rauschgrenze von 0,037 (Kapitel 5.2).
 - **RoBERTa bricht auf UQ ein, bei jeder Lernrate.** Auf UA erreicht es bis zu 0,768, auf UQ nur 0,288 bis 0,362, gegenüber 0,509 für Llama-3.2-1B.
 - **Training ist reproduzierbar.** Die beiden `_seed114514_v2`-Läufe stimmen exakt mit ihren Originalen überein.
 
@@ -46,9 +46,11 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | GATE, kausal | Llama-3.2-3B | 0,757 (0,022) | 0,743 (0,006) | 0,550 (0,044) | 0,608 (0,021) |
 | t-concat, kausal | Llama-3.2-3B | 0,761 (0,006) | 0,750 (0,004) | 0,552 (0,019) | 0,602 (0,014) |
 | fester Kopf, Rubrik | Llama-3.2-3B | 0,722 (0,081) | 0,720 (0,032) | 0,517 (0,089) | 0,578 (0,055) |
+| CONDIFF, vollständig bidirektional | Mistral-7B | 0,802 (0,011) | 0,783 (0,007) | 0,515 (0,038) | 0,571 (0,030) |
 | CONCAT, kausal | Mistral-7B | 0,772 (0,037) | 0,757 (0,041) | 0,604 (0,058) | 0,632 (0,024) |
 | CONDIFF, kausal | Mistral-7B | 0,779 (0,046) | 0,766 (0,009) | 0,605 (0,007) | 0,628 (0,008) |
 | GATE, kausal | Mistral-7B | 0,781 (0,020) | 0,758 (0,032) | 0,567 (0,044) | 0,615 (0,026) |
+| fester Kopf, Rubrik | Mistral-7B | 0,811 (0,033) | 0,781 (0,027) | 0,602 (0,039) | 0,641 (0,016) |
 
 ### Alle Vergleiche mit Urteil
 
@@ -62,6 +64,8 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | Span-Alignment gegen festen Kopf (1B, acht Saaten) | 5.3.1 | UQ | +0,069 | — | +0,042 | **Effekt** |
 | Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UA | +0,008 | — | +0,005 | — |
 | Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UQ | +0,027 | — | +0,018 | — |
+| Span-Alignment gegen festen Kopf (7B) | 5.3.1 | UA | −0,032 | — | −0,015 | — |
+| Span-Alignment gegen festen Kopf (7B) | 5.3.1 | UQ | +0,003 | — | −0,013 | Hinweis |
 | Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UA | +0,054 | Hinweis | +0,040 | **Effekt** |
 | Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UQ | −0,001 | — | −0,002 | — |
 | Kontext mit gegen ohne Rubrik (1B) | 5.3.2 | UA | −0,036 | Hinweis | −0,027 | — |
@@ -102,6 +106,8 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | vollständig bidirektional gegen kausal (1B) | 5.4.3 | UQ | −0,016 | — | −0,041 | **Effekt** |
 | vollständig bidirektional gegen kausal (3B) | 5.4.3 | UA | −0,073 | **Effekt** | −0,028 | — |
 | vollständig bidirektional gegen kausal (3B) | 5.4.3 | UQ | −0,186 | **Effekt** | −0,070 | **Effekt** |
+| vollständig bidirektional gegen kausal (7B) | 5.4.3 | UA | +0,023 | — | +0,017 | **Effekt** |
+| vollständig bidirektional gegen kausal (7B) | 5.4.3 | UQ | −0,089 | **Effekt** | −0,058 | **Effekt** |
 | vollständig bidirektional gegen kausal (1B, acht Saaten) | 5.4.3 | UA | +0,033 | — | +0,012 | — |
 | vollständig bidirektional gegen kausal (1B, acht Saaten) | 5.4.3 | UQ | −0,032 | — | −0,038 | **Effekt** |
 | lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UA | +0,036 | — | +0,013 | — |
@@ -109,7 +115,7 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 
 ## Die Läufe im Einzelnen
 
-Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testsplit; Macro-F1 und Accuracy stehen in der `*_metrics.json` des Laufs. Die Spalte **Was der Lauf zeigt** nennt, welche Frage der Lauf beantwortet, und vergleicht ihn mit seiner Referenz bei gleicher Saat. Solche Einzelvergleiche sind gegen die Rauschgrenze von 0,036 QWK zu lesen; belastbar sind erst die Drei-Saat-Vergleiche oben.
+Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testsplit; Macro-F1 und Accuracy stehen in der `*_metrics.json` des Laufs. Die Spalte **Was der Lauf zeigt** nennt, welche Frage der Lauf beantwortet, und vergleicht ihn mit seiner Referenz bei gleicher Saat. Solche Einzelvergleiche sind gegen die Rauschgrenze von 0,037 QWK zu lesen; belastbar sind erst die Drei-Saat-Vergleiche oben.
 
 ### Llama-3.2-1B
 
@@ -195,8 +201,13 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | --- | --- | --- | --- | --- | --- | --- |
 | `beetle_bidir02_mistral7b` ¹ | CONDIFF, 6 Schichten bidirektional (ρ = 0,2) | 5e-5 ¹ | 114514 | 0,587 | 0,210 | Attention-Maske: 6 von 32 Schichten bidirektional, ρ = 0,2, Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b`: UA −0,216 · UQ −0,396 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). **Instabiler Lauf: sagt alle Stufen vorher, liegt aber weit unter allen übrigen Mistral-Bedingungen; in Kapitel 5.5.2 von der Deutung ausgenommen.** Die Wiederholung `beetle_bidir02_mistral7b_v2` liegt im Bereich der übrigen Mistral-Läufe. |
 | `beetle_bidir02_mistral7b_v2` | CONDIFF, 6 Schichten bidirektional (ρ = 0,2) | 5e-5 | 114514 | 0,778 | 0,593 | Wiederholung des instabilen Laufs `beetle_bidir02_mistral7b` mit derselben Saat in neuerer Umgebung (transformers 4.57.6). Gegenüber kausaler Referenz `beetle_condiff_mistral7b`: UA −0,024 · UQ −0,013 → im Rauschen. Der ursprüngliche Einbruch war kein Effekt der Maske (Kapitel 5.5.2). |
+| `beetle_bidir04_mistral7b` | CONDIFF, 12 Schichten bidirektional (ρ = 0,4) | 5e-5 | 114514 | 0,660 | 0,275 | Attention-Maske: 12 von 32 Schichten bidirektional, ρ = 0,4, Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b`: UA −0,142 · UQ −0,332 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). **Schwacher Lauf wie `beetle_bidir02_mistral7b`: sagt alle Stufen vorher, liegt aber weit unter den übrigen Mistral-Bedingungen (Kapitel 5.5.2).** Eine Wiederholung mit derselben Saat würde in dieser Umgebung dasselbe Ergebnis liefern. |
 | `beetle_bidir06_mistral7b` ¹ | CONDIFF, 19 Schichten bidirektional (ρ = 0,6) | 5e-5 ¹ | 114514 | 0,801 | 0,609 | Attention-Maske: 19 von 32 Schichten bidirektional, ρ = 0,6, Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b`: UA −0,002 · UQ +0,002 → im Rauschen. |
+| `beetle_bidir08_mistral7b` | CONDIFF, 25 Schichten bidirektional (ρ = 0,8) | 5e-5 | 114514 | 0,761 | 0,612 | Attention-Maske: 25 von 32 Schichten bidirektional, ρ = 0,8, Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b`: UA −0,042 · UQ +0,006 → über der Rauschgrenze auf UA (Einzelvergleich). |
 | `beetle_bidir10_mistral7b` ¹ | CONDIFF, 1 Schicht bidirektional (ρ = 1,0) | 5e-5 ¹ | 114514 | 0,793 | 0,592 | Attention-Maske: 1 von 32 Schichten bidirektional, ρ = 1,0 (ρ = 1,0 bedeutet genau eine Schicht, nicht das volle Modell), Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b`: UA −0,010 · UQ −0,014 → im Rauschen. |
+| `beetle_bidirfull_mistral7b` | CONDIFF, 32 Schichten bidirektional (ρ = L) | 5e-5 | 114514 | 0,795 | 0,498 | Attention-Maske: alle 32 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b`: UA −0,007 · UQ −0,108 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,802 (Δ 0,011) · UQ 0,515 (Δ 0,038). |
+| `beetle_bidirfull_mistral7b_seed1` | CONDIFF, 32 Schichten bidirektional (ρ = L) | 5e-5 | 1 | 0,803 | 0,536 | Attention-Maske: alle 32 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b_seed1`: UA +0,026 · UQ −0,064 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,802 (Δ 0,011) · UQ 0,515 (Δ 0,038). |
+| `beetle_bidirfull_mistral7b_seed2` | CONDIFF, 32 Schichten bidirektional (ρ = L) | 5e-5 | 2 | 0,807 | 0,511 | Attention-Maske: alle 32 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `beetle_condiff_mistral7b_seed2`: UA +0,050 · UQ −0,096 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,802 (Δ 0,011) · UQ 0,515 (Δ 0,038). |
 | `beetle_concat_mistral7b` | CONCAT, kausal | 5e-5 | 114514 | 0,756 | 0,610 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `beetle_condiff_mistral7b`: UA −0,047 · UQ +0,004 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,772 (Δ 0,037) · UQ 0,604 (Δ 0,058). |
 | `beetle_concat_mistral7b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,794 | 0,631 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `beetle_condiff_mistral7b_seed1`: UA +0,016 · UQ +0,030 → im Rauschen. Drei-Saat-Mittel: UA 0,772 (Δ 0,037) · UQ 0,604 (Δ 0,058). |
 | `beetle_concat_mistral7b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,768 | 0,572 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `beetle_condiff_mistral7b_seed2`: UA +0,011 · UQ −0,035 → im Rauschen. Drei-Saat-Mittel: UA 0,772 (Δ 0,037) · UQ 0,604 (Δ 0,058). |
@@ -206,6 +217,10 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `beetle_gate_mistral7b` | GATE, kausal | 5e-5 | 114514 | 0,770 | 0,576 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `beetle_condiff_mistral7b`: UA −0,033 · UQ −0,031 → im Rauschen. Drei-Saat-Mittel: UA 0,781 (Δ 0,020) · UQ 0,567 (Δ 0,044). |
 | `beetle_gate_mistral7b_seed1` | GATE, kausal | 5e-5 | 1 | 0,790 | 0,541 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `beetle_condiff_mistral7b_seed1`: UA +0,012 · UQ −0,060 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,781 (Δ 0,020) · UQ 0,567 (Δ 0,044). |
 | `beetle_gate_mistral7b_seed2` | GATE, kausal | 5e-5 | 2 | 0,782 | 0,585 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `beetle_condiff_mistral7b_seed2`: UA +0,025 · UQ −0,022 → im Rauschen. Drei-Saat-Mittel: UA 0,781 (Δ 0,020) · UQ 0,567 (Δ 0,044). |
+| `beetle_seqclass_mistral7b` | fester Kopf, kausal | 5e-5 | 114514 | 0,822 | 0,593 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `beetle_condiff_mistral7b`: UA +0,020 · UQ −0,014 → im Rauschen. Drei-Saat-Mittel: UA 0,811 (Δ 0,033) · UQ 0,602 (Δ 0,039). |
+| `beetle_seqclass_mistral7b_seed1` | fester Kopf, kausal | 5e-5 | 1 | 0,822 | 0,587 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `beetle_condiff_mistral7b_seed1`: UA +0,044 · UQ −0,013 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,811 (Δ 0,033) · UQ 0,602 (Δ 0,039). |
+| `beetle_seqclass_mistral7b_seed2` | fester Kopf, kausal | 5e-5 | 2 | 0,789 | 0,626 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `beetle_condiff_mistral7b_seed2`: UA +0,032 · UQ +0,019 → im Rauschen. Drei-Saat-Mittel: UA 0,811 (Δ 0,033) · UQ 0,602 (Δ 0,039). |
+| `beetle_tconcat_mistral7b` | t-concat, kausal | 5e-5 | 114514 | 0,775 | 0,598 | Bezugsgröße der Fusion: Antwort-Span statt Sequenzrepräsentation, sonst wie CONCAT. Gegenüber `beetle_concat_mistral7b`: UA +0,019 · UQ −0,012 → im Rauschen. |
 
 ### RoBERTa-base
 
@@ -269,5 +284,6 @@ Läufe der ersten Trainingswelle haben **keine** `config.json` und `training_arg
 ## Bekannte Einschränkungen
 
 - **`beetle_bidir02_mistral7b`** erreicht nur 0,587 (UA) und 0,210 (UQ). Der Lauf ist funktionsfähig, aber instabil trainiert und von der Deutung ausgenommen. Die Wiederholung `_v2` erreicht 0,778 / 0,593; ob Umgebung oder Zufall den Einbruch verursacht hat, ist nicht trennbar, ein Maskeneffekt ist es nicht.
-- **Mistral-7B ist bei der Maske unvollständig:** Es fehlen `bidir04`, `bidir08` und `bidirfull`. BERT liegt nur für UA vor.
+- **`beetle_bidir04_mistral7b`** erreicht nur 0,660 (UA) und 0,275 (UQ), mit demselben Muster wie `bidir02`: Alle Stufen werden vorhergesagt, die Leistung liegt aber weit unter den übrigen Mistral-Bedingungen. Da das Training in dieser Umgebung deterministisch ist, würde eine Wiederholung mit derselben Saat dasselbe Ergebnis liefern (Kapitel 5.5.2).
+- **BERT liegt nur für UA vor.**
 - **Gemischte Softwareumgebungen:** In mehreren Drei-Saat-Gruppen stammt der Lauf mit Saat 114514 aus einer anderen Umgebung als die Saaten 1 und 2. Für `beetle_condiff_llama1b` wird deshalb `_seed114514_verified` verwendet. Details in Kapitel 5.2 der Arbeit.

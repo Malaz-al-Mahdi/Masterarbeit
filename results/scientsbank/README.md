@@ -6,19 +6,19 @@ Der einzige Benchmark mit **allen drei** Generalisierungsbedingungen. Die 46 Fra
 
 **Umfang:** 4.969 Trainingsinstanzen; UA 540, UQ 733, UD 4.562
 
-Insgesamt liegen hier **83 Trainingsläufe**.
+Insgesamt liegen hier **95 Trainingsläufe**.
 
 ## Was die Ergebnisse aussagen
 
 Die folgenden Aussagen stützen sich, wo nicht anders vermerkt, auf Mittelwerte über drei Zufallssaaten. Ein Unterschied gilt als **Effekt**, wenn die Differenz der Mittelwerte die größere der beiden Spannweiten übersteigt, als **Hinweis**, wenn sich die Spannweiten nicht überlappen, die Differenz aber kleiner ist. Die Tabellen unten zeigen jedes Urteil unter QWK und unter Macro-F1.
 
-- **Aufgabenbezogene Information ist der bestimmende Faktor.** Ohne Rubrik und ohne Kontext fällt der feste Kopf um 0,235 / 0,520 / 0,361 QWK (1B) und 0,255 / 0,528 / 0,440 (3B). Auf UQ und UD liegt die Leistung dann auf oder unter dem Zufallsniveau. Dieser Befund gilt unter beiden Metriken.
+- **Aufgabenbezogene Information ist der bestimmende Faktor.** Ohne Rubrik und ohne Kontext fällt der feste Kopf um 0,235 / 0,520 / 0,361 QWK (1B), 0,255 / 0,528 / 0,440 (3B) und 0,257 / 0,604 / 0,477 (7B). Auf UQ und UD liegt die Leistung dann auf oder unter dem Zufallsniveau. Dieser Befund gilt unter beiden Metriken.
 - **Frage und Musterlösung ersetzen die Rubrik.** Kontext allein übertrifft Rubrik allein um 0,100 / 0,060 / 0,077 QWK. Unter Macro-F1 gilt das nur auf UA; auf UQ und UD macht Kontext das Modell vor allem seltener grob falsch: Weite Fehler (incorrect ↔ correct) sinken von rund 11 % auf rund 7 % der Instanzen.
 - **Die Rubrik bringt bei vorhandenem Kontext unter QWK nichts** (−0,012 / +0,015 / +0,006). Unter Macro-F1 trägt sie auf UD etwas bei (+0,029, Effekt).
 - **Die Fusionsmechanismen sind nicht zu unterscheiden** — auf keinem der drei Backbones und unter keiner der beiden Metriken. Auf Llama-3.2-3B liegt GATE nominell auf allen drei Splits vorn; bei Mistral-7B liegen die Varianten auf UA im Mittel nur 0,009 QWK auseinander, und die Rangfolge wechselt.
-- **Span-Alignment gegen festen Kopf: kleiner Vorteil nur bei 1B.** Auf UA (+0,021) und UD (+0,026) besteht der Vorteil die Auswertungsregel, liegt aber unter der Rauschgrenze; bei 3B ist kein Unterschied nachweisbar.
+- **Span-Alignment gegen festen Kopf: kleiner Vorteil nur bei 1B.** Auf UA (+0,021) und UD (+0,026) besteht der Vorteil die Auswertungsregel, liegt aber unter der Rauschgrenze; bei 3B und 7B ist kein Vorteil nachweisbar; bei 7B liegt der feste Kopf auf UD mit einem Hinweis vorn (−0,014).
 - **Die Bezugsgröße ist ohne Wirkung.** t-concat und CONCAT liegen auf allen drei Splits innerhalb ihrer Spannweiten. Mit nur der Saat 114514 hätte t-concat einen deutlichen Vorteil nahegelegt.
-- **Vollständige Bidirektionalität nützt dem größeren Backbone auf UQ.** Llama-3.2-3B gewinnt 0,060 QWK auf UQ (Effekt unter beiden Metriken); bei Llama-3.2-1B ist kein Unterschied nachweisbar.
+- **Vollständige Bidirektionalität nützt dem größeren Backbone auf UQ.** Llama-3.2-3B gewinnt 0,060 QWK auf UQ (Effekt unter beiden Metriken); bei Llama-3.2-1B ist kein Unterschied nachweisbar, bei Mistral-7B ebenso wenig (−0,011 / −0,035 / −0,037). Dort sind die Spannweiten wegen des schwachen Laufs mit Saat 1 sehr groß (bis 0,206).
 - **Die höhere Lernrate hilft hier nicht.** Llama-3.2-1B bei 2·10⁻⁴ liegt auf UA und UD unter allen Läufen bei 5·10⁻⁵ (0,679 / 0,496 QWK). Llama-3.2-3B liegt bei 2·10⁻⁴ auf UQ über dem Bereich (+0,030), auf UD darunter (−0,041), auf UA innerhalb.
 - **Encoder sind auf diesem Benchmark fragil.** BERT liegt bei jeder geprüften Lernrate auf Zufallsniveau; RoBERTa funktioniert nur bei 1·10⁻⁵ und bleibt auch dann hinter Llama-3.2-1B.
 - **Die Bibliotheksversion ändert Ergebnisse messbar.** Bei gleicher Saat weichen `_tf4576` und `_tf5161` um +0,016 / −0,014 / −0,001 QWK ab.
@@ -45,9 +45,12 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 | fester Kopf, Rubrik | Llama-3.2-3B | 0,746 (0,028) | 0,725 (0,021) | 0,580 (0,076) | 0,633 (0,066) | 0,641 (0,026) | 0,646 (0,011) |
 | fester Kopf, weder Rubrik noch Kontext | Llama-3.2-3B | 0,491 (0,025) | 0,573 (0,027) | 0,052 (0,063) | 0,368 (0,027) | 0,201 (0,029) | 0,385 (0,035) |
 | t-concat, kausal | Llama-3.2-3B | 0,734 (0,066) | 0,721 (0,039) | 0,584 (0,059) | 0,649 (0,029) | 0,615 (0,019) | 0,657 (0,013) |
+| CONDIFF, vollständig bidirektional | Mistral-7B | 0,744 (0,110) | 0,711 (0,080) | 0,604 (0,206) | 0,669 (0,120) | 0,605 (0,199) | 0,655 (0,118) |
 | CONCAT, kausal | Mistral-7B | 0,750 (0,050) | 0,720 (0,034) | 0,652 (0,046) | 0,677 (0,040) | 0,647 (0,037) | 0,670 (0,025) |
 | CONDIFF, kausal | Mistral-7B | 0,755 (0,030) | 0,720 (0,020) | 0,639 (0,063) | 0,671 (0,048) | 0,641 (0,011) | 0,662 (0,014) |
 | GATE, kausal | Mistral-7B | 0,758 (0,014) | 0,730 (0,023) | 0,632 (0,015) | 0,688 (0,003) | 0,638 (0,031) | 0,665 (0,006) |
+| fester Kopf, Rubrik | Mistral-7B | 0,765 (0,016) | 0,733 (0,007) | 0,627 (0,070) | 0,662 (0,042) | 0,655 (0,022) | 0,671 (0,004) |
+| fester Kopf, weder Rubrik noch Kontext | Mistral-7B | 0,508 (0,053) | 0,582 (0,022) | 0,023 (0,052) | 0,348 (0,036) | 0,179 (0,043) | 0,381 (0,027) |
 
 ### Alle Vergleiche mit Urteil
 
@@ -61,12 +64,18 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 | Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UA | −0,011 | — | −0,013 | — |
 | Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UQ | −0,004 | — | +0,011 | — |
 | Span-Alignment gegen festen Kopf (3B) | 5.3.1 | UD | −0,024 | — | +0,010 | — |
+| Span-Alignment gegen festen Kopf (7B) | 5.3.1 | UA | −0,010 | — | −0,013 | Hinweis |
+| Span-Alignment gegen festen Kopf (7B) | 5.3.1 | UQ | +0,013 | — | +0,009 | — |
+| Span-Alignment gegen festen Kopf (7B) | 5.3.1 | UD | −0,014 | Hinweis | −0,009 | Hinweis |
 | Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UA | +0,235 | **Effekt** | +0,116 | **Effekt** |
 | Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UQ | +0,520 | **Effekt** | +0,286 | **Effekt** |
 | Rubrik gegen weder Rubrik noch Kontext (1B) | 5.3.2 | UD | +0,361 | **Effekt** | +0,249 | **Effekt** |
 | Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3.2 | UA | +0,255 | **Effekt** | +0,152 | **Effekt** |
 | Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3.2 | UQ | +0,528 | **Effekt** | +0,265 | **Effekt** |
 | Rubrik gegen weder Rubrik noch Kontext (3B) | 5.3.2 | UD | +0,440 | **Effekt** | +0,260 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (7B) | 5.3.2 | UA | +0,257 | **Effekt** | +0,151 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (7B) | 5.3.2 | UQ | +0,604 | **Effekt** | +0,314 | **Effekt** |
+| Rubrik gegen weder Rubrik noch Kontext (7B) | 5.3.2 | UD | +0,477 | **Effekt** | +0,290 | **Effekt** |
 | Kontext und Rubrik gegen nur Kontext (1B) | 5.3.2 | UA | −0,012 | — | −0,020 | — |
 | Kontext und Rubrik gegen nur Kontext (1B) | 5.3.2 | UQ | +0,015 | — | +0,019 | Hinweis |
 | Kontext und Rubrik gegen nur Kontext (1B) | 5.3.2 | UD | +0,006 | — | +0,029 | **Effekt** |
@@ -121,10 +130,13 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 | vollständig bidirektional gegen kausal (3B) | 5.4.3 | UA | +0,032 | Hinweis | +0,011 | — |
 | vollständig bidirektional gegen kausal (3B) | 5.4.3 | UQ | +0,060 | **Effekt** | +0,052 | **Effekt** |
 | vollständig bidirektional gegen kausal (3B) | 5.4.3 | UD | +0,008 | — | +0,011 | — |
+| vollständig bidirektional gegen kausal (7B) | 5.4.3 | UA | −0,011 | — | −0,009 | — |
+| vollständig bidirektional gegen kausal (7B) | 5.4.3 | UQ | −0,035 | — | −0,002 | — |
+| vollständig bidirektional gegen kausal (7B) | 5.4.3 | UD | −0,037 | — | −0,007 | — |
 
 ## Die Läufe im Einzelnen
 
-Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testsplit; Macro-F1 und Accuracy stehen in der `*_metrics.json` des Laufs. Die Spalte **Was der Lauf zeigt** nennt, welche Frage der Lauf beantwortet, und vergleicht ihn mit seiner Referenz bei gleicher Saat. Solche Einzelvergleiche sind gegen die Rauschgrenze von 0,036 QWK zu lesen; belastbar sind erst die Drei-Saat-Vergleiche oben.
+Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testsplit; Macro-F1 und Accuracy stehen in der `*_metrics.json` des Laufs. Die Spalte **Was der Lauf zeigt** nennt, welche Frage der Lauf beantwortet, und vergleicht ihn mit seiner Referenz bei gleicher Saat. Solche Einzelvergleiche sind gegen die Rauschgrenze von 0,037 QWK zu lesen; belastbar sind erst die Drei-Saat-Vergleiche oben.
 
 ### Llama-3.2-1B
 
@@ -203,9 +215,14 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | Lauf | Konfiguration | lr | Saat | UA | UQ | UD | Was der Lauf zeigt |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `scientsbank_bidir02_mistral7b` ¹ | CONDIFF, 6 Schichten bidirektional (ρ = 0,2) | 5e-5 ¹ | 114514 | 0,766 | 0,627 | 0,652 | Attention-Maske: 6 von 32 Schichten bidirektional, ρ = 0,2, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA +0,023 · UQ +0,005 · UD +0,017 → im Rauschen. |
+| `scientsbank_bidir04_mistral7b` | CONDIFF, 12 Schichten bidirektional (ρ = 0,4) | 5e-5 | 114514 | 0,739 | 0,667 | 0,645 | Attention-Maske: 12 von 32 Schichten bidirektional, ρ = 0,4, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA −0,004 · UQ +0,046 · UD +0,010 → über der Rauschgrenze auf UQ (Einzelvergleich). |
 | `scientsbank_bidir06_mistral7b` ¹ | CONDIFF, 19 Schichten bidirektional (ρ = 0,6) | 5e-5 ¹ | 114514 | 0,650 | 0,378 | 0,393 | Attention-Maske: 19 von 32 Schichten bidirektional, ρ = 0,6, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA −0,093 · UQ −0,243 · UD −0,241 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). **Instabiler Lauf wie `beetle_bidir02_mistral7b`; von der Deutung ausgenommen.** Die Wiederholung `scientsbank_bidir06_mistral7b_v2` liegt im Bereich der übrigen Mistral-Läufe. |
 | `scientsbank_bidir06_mistral7b_v2` | CONDIFF, 19 Schichten bidirektional (ρ = 0,6) | 5e-5 | 114514 | 0,751 | 0,657 | 0,651 | Wiederholung des instabilen Laufs `scientsbank_bidir06_mistral7b` mit derselben Saat in neuerer Umgebung (transformers 4.57.6). Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA +0,008 · UQ +0,036 · UD +0,017 → im Rauschen. Der ursprüngliche Einbruch war kein Effekt der Maske (Kapitel 5.5.2). |
+| `scientsbank_bidir08_mistral7b` | CONDIFF, 25 Schichten bidirektional (ρ = 0,8) | 5e-5 | 114514 | 0,742 | 0,658 | 0,699 | Attention-Maske: 25 von 32 Schichten bidirektional, ρ = 0,8, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA −0,001 · UQ +0,037 · UD +0,064 → über der Rauschgrenze auf UD (Einzelvergleich). |
 | `scientsbank_bidir10_mistral7b` ¹ | CONDIFF, 1 Schicht bidirektional (ρ = 1,0) | 5e-5 ¹ | 114514 | 0,754 | 0,618 | 0,650 | Attention-Maske: 1 von 32 Schichten bidirektional, ρ = 1,0 (ρ = 1,0 bedeutet genau eine Schicht, nicht das volle Modell), Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA +0,011 · UQ −0,003 · UD +0,016 → im Rauschen. |
+| `scientsbank_bidirfull_mistral7b` | CONDIFF, 32 Schichten bidirektional (ρ = L) | 5e-5 | 114514 | 0,786 | 0,667 | 0,679 | Attention-Maske: alle 32 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b`: UA +0,042 · UQ +0,046 · UD +0,045 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,744 (Δ 0,110) · UQ 0,604 (Δ 0,206) · UD 0,605 (Δ 0,199). |
+| `scientsbank_bidirfull_mistral7b_seed1` | CONDIFF, 32 Schichten bidirektional (ρ = L) | 5e-5 | 1 | 0,675 | 0,470 | 0,481 | Attention-Maske: alle 32 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b_seed1`: UA −0,074 · UQ −0,210 · UD −0,164 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,744 (Δ 0,110) · UQ 0,604 (Δ 0,206) · UD 0,605 (Δ 0,199). **Schwacher Lauf: sagt alle Stufen vorher, liegt aber auf allen Splits weit unter den beiden anderen Saaten. Er bleibt im Drei-Saat-Mittel enthalten und bestimmt die größte Saat-Spannweite der Arbeit (0,206; Kapitel 5.5.2).** |
+| `scientsbank_bidirfull_mistral7b_seed2` | CONDIFF, 32 Schichten bidirektional (ρ = L) | 5e-5 | 2 | 0,770 | 0,676 | 0,654 | Attention-Maske: alle 32 Schichten bidirektional, Fusion CONDIFF. Gegenüber kausaler Referenz `scientsbank_condiff_mistral7b_seed2`: UA −0,003 · UQ +0,059 · UD +0,009 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,744 (Δ 0,110) · UQ 0,604 (Δ 0,206) · UD 0,605 (Δ 0,199). |
 | `scientsbank_concat_mistral7b` | CONCAT, kausal | 5e-5 | 114514 | 0,758 | 0,628 | 0,624 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b`: UA +0,014 · UQ +0,006 · UD −0,011 → im Rauschen. Drei-Saat-Mittel: UA 0,750 (Δ 0,050) · UQ 0,652 (Δ 0,046) · UD 0,647 (Δ 0,037). |
 | `scientsbank_concat_mistral7b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,721 | 0,673 | 0,657 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed1`: UA −0,028 · UQ −0,007 · UD +0,012 → im Rauschen. Drei-Saat-Mittel: UA 0,750 (Δ 0,050) · UQ 0,652 (Δ 0,046) · UD 0,647 (Δ 0,037). |
 | `scientsbank_concat_mistral7b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,771 | 0,654 | 0,661 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed2`: UA −0,002 · UQ +0,037 · UD +0,016 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,750 (Δ 0,050) · UQ 0,652 (Δ 0,046) · UD 0,647 (Δ 0,037). |
@@ -215,6 +232,13 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `scientsbank_gate_mistral7b` | GATE, kausal | 5e-5 | 114514 | 0,764 | 0,638 | 0,650 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b`: UA +0,021 · UQ +0,017 · UD +0,015 → im Rauschen. Drei-Saat-Mittel: UA 0,758 (Δ 0,014) · UQ 0,632 (Δ 0,015) · UD 0,638 (Δ 0,031). |
 | `scientsbank_gate_mistral7b_seed1` | GATE, kausal | 5e-5 | 1 | 0,761 | 0,634 | 0,645 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed1`: UA +0,012 · UQ −0,046 · UD ±0,000 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,758 (Δ 0,014) · UQ 0,632 (Δ 0,015) · UD 0,638 (Δ 0,031). |
 | `scientsbank_gate_mistral7b_seed2` | GATE, kausal | 5e-5 | 2 | 0,750 | 0,623 | 0,619 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_mistral7b_seed2`: UA −0,022 · UQ +0,006 · UD −0,026 → im Rauschen. Drei-Saat-Mittel: UA 0,758 (Δ 0,014) · UQ 0,632 (Δ 0,015) · UD 0,638 (Δ 0,031). |
+| `scientsbank_seqclass_mistral7b` | fester Kopf, kausal | 5e-5 | 114514 | 0,755 | 0,664 | 0,645 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `scientsbank_condiff_mistral7b`: UA +0,012 · UQ +0,042 · UD +0,011 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,765 (Δ 0,016) · UQ 0,627 (Δ 0,070) · UD 0,655 (Δ 0,022). |
+| `scientsbank_seqclass_mistral7b_seed1` | fester Kopf, kausal | 5e-5 | 1 | 0,771 | 0,622 | 0,653 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `scientsbank_condiff_mistral7b_seed1`: UA +0,022 · UQ −0,058 · UD +0,008 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,765 (Δ 0,016) · UQ 0,627 (Δ 0,070) · UD 0,655 (Δ 0,022). |
+| `scientsbank_seqclass_mistral7b_seed2` | fester Kopf, kausal | 5e-5 | 2 | 0,770 | 0,594 | 0,667 | Baseline mit festem Klassifikationskopf: Rubriktexte in der Eingabe, aber kein Span-Alignment. Gegenüber Span-Alignment `scientsbank_condiff_mistral7b_seed2`: UA −0,003 · UQ −0,023 · UD +0,023 → im Rauschen. Drei-Saat-Mittel: UA 0,765 (Δ 0,016) · UQ 0,627 (Δ 0,070) · UD 0,655 (Δ 0,022). |
+| `scientsbank_seqclass_norub_mistral7b` | fester Kopf, kausal, ohne Rubrik | 5e-5 | 114514 | 0,517 | −0,000 | 0,180 | Ablation: Rubriktexte entfernt, keine andere Aufgabeninformation, das Modell sieht nur die Antwort; fester Klassifikationskopf. Gegenüber Rubrik allein `scientsbank_seqclass_mistral7b`: UA −0,238 · UQ −0,664 · UD −0,465 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,508 (Δ 0,053) · UQ 0,023 (Δ 0,052) · UD 0,179 (Δ 0,043). |
+| `scientsbank_seqclass_norub_mistral7b_seed1` | fester Kopf, kausal, ohne Rubrik | 5e-5 | 1 | 0,530 | 0,016 | 0,200 | Ablation: Rubriktexte entfernt, keine andere Aufgabeninformation, das Modell sieht nur die Antwort; fester Klassifikationskopf. Gegenüber Rubrik allein `scientsbank_seqclass_mistral7b_seed1`: UA −0,241 · UQ −0,606 · UD −0,453 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,508 (Δ 0,053) · UQ 0,023 (Δ 0,052) · UD 0,179 (Δ 0,043). |
+| `scientsbank_seqclass_norub_mistral7b_seed2` | fester Kopf, kausal, ohne Rubrik | 5e-5 | 2 | 0,478 | 0,052 | 0,157 | Ablation: Rubriktexte entfernt, keine andere Aufgabeninformation, das Modell sieht nur die Antwort; fester Klassifikationskopf. Gegenüber Rubrik allein `scientsbank_seqclass_mistral7b_seed2`: UA −0,292 · UQ −0,542 · UD −0,511 → über der Rauschgrenze auf UA, UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,508 (Δ 0,053) · UQ 0,023 (Δ 0,052) · UD 0,179 (Δ 0,043). |
+| `scientsbank_tconcat_mistral7b` | t-concat, kausal | 5e-5 | 114514 | 0,759 | 0,617 | 0,653 | Bezugsgröße der Fusion: Antwort-Span statt Sequenzrepräsentation, sonst wie CONCAT. Gegenüber `scientsbank_concat_mistral7b`: UA +0,001 · UQ −0,010 · UD +0,030 → im Rauschen. |
 
 ### RoBERTa-base
 
@@ -283,5 +307,5 @@ Läufe der ersten Trainingswelle haben **keine** `config.json` und `training_arg
 - **BERT scheitert auf diesem Benchmark vollständig**, bei allen geprüften Lernraten. Die Ursache ist ungeklärt.
 - **RoBERTa scheitert bei 2·10⁻⁵ und 5·10⁻⁵** (Accuracy unter der Mehrheitsschranke von 0,431).
 - **`scientsbank_bidir06_mistral7b`** fällt deutlich ab (UQ 0,378). Die Wiederholung `_v2` erreicht 0,751 / 0,657 / 0,651; ob Umgebung oder Zufall den Einbruch verursacht hat, ist nicht trennbar, ein Maskeneffekt ist es nicht.
-- **Mistral-7B ist bei der Maske unvollständig:** Es fehlen `bidir04`, `bidir08` und `bidirfull`.
+- **`scientsbank_bidirfull_mistral7b_seed1`** liegt weit unter den beiden anderen Saaten (0,675 / 0,470 / 0,481 gegenüber 0,770 / 0,676 / 0,654 mit Saat 2). Der Lauf sagt alle Stufen vorher und ist funktionsfähig, aber schwach. Er bleibt im Drei-Saat-Mittel enthalten und bestimmt die größte Saat-Spannweite der Arbeit (0,206, Kapitel 5.5.2).
 - **Gemischte Softwareumgebungen:** In mehreren Drei-Saat-Gruppen stammt der Lauf mit Saat 114514 aus einer anderen Umgebung als die Saaten 1 und 2. Für den festen Kopf auf Llama-3.2-3B wird deshalb `_tf5161` verwendet. Details in Kapitel 5.2 der Arbeit.
