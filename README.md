@@ -1,6 +1,6 @@
 # Span-based Classifier for Short Answer Scoring and Beyond
 
-Dieses Repository enthält die Arbeit als PDF (deutsche und englische Fassung) und die Ergebnisse **aller 250 Trainingsläufe**, auf denen Kapitel 5 beruht.
+Dieses Repository enthält die Arbeit als PDF (deutsche und englische Fassung) und die Ergebnisse **aller 271 Trainingsläufe**, auf denen Kapitel 5 beruht.
 
 ## Inhalt
 
@@ -9,10 +9,10 @@ main.pdf                 Die Masterarbeit (deutsche Fassung)
 main_en.pdf              Die Masterarbeit (englische Fassung)
 results/
 ├── alle_metriken.csv    QWK, Macro-F1 und Accuracy aller Läufe und Splits in einer Tabelle
-├── asap/                 51 Läufe, ASAP-SAS, inkl. 9 Transferläufe (README mit Erklärung jedes Laufs)
-├── beetle/               95 Läufe, Beetle (README mit Erklärung jedes Laufs)
-├── scientsbank/          95 Läufe, SciEntsBank (README mit Erklärung jedes Laufs)
-├── stance/                9 Läufe, Stance Detection, SemEval-2016 Task 6 (RQ3)
+├── asap/                 57 Läufe, ASAP-SAS, inkl. 15 Transferläufe (README mit Erklärung jedes Laufs)
+├── beetle/               97 Läufe, Beetle (README mit Erklärung jedes Laufs)
+├── scientsbank/          99 Läufe, SciEntsBank (README mit Erklärung jedes Laufs)
+├── stance/               18 Läufe, Stance Detection, SemEval-2016 Task 6 (RQ3)
 └── logs/                 Trainingslogs und Softwareversionen der Nachtrainings
 ```
 
@@ -38,13 +38,13 @@ Kapitel 5 folgt drei Forschungsfragen. **RQ1:** Übertrifft der span-basierte Kl
 
 1. **Entscheidend ist, welche Information das Modell erhält, nicht wie sie verarbeitet wird.** Ohne jede Aufgabeninformation verliert das Modell auf SciEntsBank bis zu 0,60 QWK und fällt auf neuen Fragen auf Zufallsniveau. Frage und Musterlösung ersetzen die Rubriktexte dabei weitgehend; unter QWK sind sie ihnen sogar überlegen, weil sie grobe Fehlbewertungen seltener machen.
 2. **Gegenüber dem festen Kopf hat das Span-Alignment nur beim kleinen Backbone einen Vorteil.** Mit Llama-3.2-1B liegt es auf Beetle um 0,088 QWK vorn (auch mit acht Saaten), mit Llama-3.2-3B und Mistral-7B ist auf keinem Benchmark ein Vorteil nachweisbar.
-3. **Strukturelle Übertragbarkeit ist keine inhaltliche.** Auf ASAP-SAS trainiert, lässt sich das Modell ohne Anpassung auf Beetle und SciEntsBank anwenden, erreicht dort aber auf allen drei Backbones nur Zufallsniveau und ordnet fast jede Antwort der untersten Stufe zu.
+3. **Strukturelle Übertragbarkeit ist keine inhaltliche.** Auf ASAP-SAS trainiert, lässt sich das Modell ohne Anpassung auf Beetle und SciEntsBank anwenden, erreicht dort aber auf allen drei Backbones nur Zufallsniveau und ordnet fast jede Antwort der untersten Stufe zu. Auch in umgekehrter Richtung (Training auf Beetle oder SciEntsBank, Test auf ASAP-SAS) scheitert die Übertragung.
 4. **Die Ausgestaltung der Fusion ist ohne nachweisbare Wirkung** — auf allen drei Backbones. Zwischen CONDIFF, CONCAT, DIFF und GATE und zwischen den beiden Bezugsgrößen ist kein Unterschied als Effekt nachweisbar.
 5. **Die Attention-Maske wirkt, aber mit wechselndem Vorzeichen.** Vollständige Bidirektionalität kostet Llama-3.2-3B auf Beetle 0,186 QWK auf neuen Fragen und bringt ihm auf SciEntsBank 0,060; auf ASAP-SAS ist sie bei beiden Llama-Größen ohne Wirkung. Mistral-7B verliert auf Beetle-UQ ebenfalls (0,089 QWK), gewinnt auf SciEntsBank aber nicht.
-6. **Über die Modellgröße ist keine sichere Aussage möglich.** Die kleinen Backbones liefen bei einem Viertel ihrer vorgesehenen Lernrate. Bei der passenden Rate ist der Vorsprung von Mistral-7B auf Beetle nicht mehr nachweisbar, der Effekt der Lernrate selbst aber auch nicht: Ein Einzellauf schien den Abstand vollständig zu schließen, mit drei Saaten wächst vor allem die Streuung. Auf ASAP-SAS liegt Mistral-7B mit drei Saaten knapp vor beiden Llama-Größen (0,856 gegenüber 0,827 und 0,835), mit Differenzen unterhalb der Rauschgrenze.
+6. **Ein Größeneffekt zeigt sich nur eingeschränkt.** Bei 5·10⁻⁵ liefen die Llama-Modelle mit einem Viertel ihrer vorgesehenen Lernrate. Bei passender Lernrate (Llama bei 2·10⁻⁴, mit drei Saaten auf Beetle und SciEntsBank) ist der Vorsprung von Mistral-7B auf Beetle nicht mehr nachweisbar, auf SciEntsBank bleibt er, am deutlichsten beim Transfer auf neue Domänen (UD). Die höhere Lernrate selbst ist nicht durchgängig günstiger.
 7. **Der Evaluationssplit entscheidet über die Schlussfolgerung.** Auf bekannten Fragen sind Encoder konkurrenzfähig, auf neuen Fragen liegt Llama-3.2-1B um 0,221 QWK vor RoBERTa.
 8. **Die Aufgabe wirkt stärker als jede Architekturvariante.** Auf ASAP-SAS reicht das QWK je Einzelaufgabe von 0,625 bis 0,898.
-9. **Das Verfahren lässt sich auf Stance Detection übertragen (RQ3).** Auf bekannten Targets schlägt das Span-Alignment den festen Kopf um 0,026 Macro-F1 (Effekt unter allen Metriken). Auf einem ungesehenen Target entscheiden die Klassenbeschreibungen: Ohne sie fällt der feste Kopf um 0,199 Macro-F1 zurück; die Übertragung bleibt insgesamt schwach.
+9. **Das Verfahren lässt sich auf Stance Detection übertragen (RQ3).** Auf bekannten Targets schlägt das Span-Alignment den festen Kopf mit beiden Llama-Größen (um 0,026 bzw. 0,018 Macro-F1). Auf einem ungesehenen Target wirken die Klassenbeschreibungen stärker als die Architektur: Ohne sie fällt der feste Kopf um 0,199 (1B) bzw. 0,044 Macro-F1 (3B) zurück; die Übertragung bleibt insgesamt schwach.
 
 ## Wie die Ergebnisse zu lesen sind
 
@@ -66,16 +66,16 @@ ASAP-SAS stellt nur UA bereit, Beetle UA und UQ, SciEntsBank alle drei. Bei Stan
 
 ### Rauschgrenze
 
-Viele Konfigurationen wurden mit drei Zufallssaaten wiederholt (114514, 1 und 2). Über 113 solcher ASAG-Zellen aus 48 Gruppen schwankt das Ergebnis allein durch die Saat um:
+Viele Konfigurationen wurden mit drei Zufallssaaten wiederholt (114514, 1 und 2). Über 121 solcher ASAG-Zellen aus 51 Gruppen schwankt das Ergebnis allein durch die Saat um:
 
 | Kennwert | Spannweite über drei Saaten |
 | --- | --- |
 | Median | 0,037 QWK |
-| Mittelwert | 0,041 QWK |
+| Mittelwert | 0,043 QWK |
 | Minimum | 0,004 QWK |
 | Maximum | 0,206 QWK |
 
-Das Maximum geht auf einen einzelnen schwachen Lauf zurück (`scientsbank_bidirfull_mistral7b_seed1`, Kapitel 5.5.2); ohne diese Gruppe liegt es bei 0,118 QWK.
+Das Maximum geht auf einen einzelnen schwachen Lauf zurück (`scientsbank_bidirfull_mistral7b_seed1`, Kapitel 5.5.2); ohne diese Gruppe liegt es bei 0,182 QWK.
 
 Ein Unterschied zwischen zwei Konfigurationen gilt als **Effekt**, wenn die Differenz der Mittelwerte die größere der beiden Spannweiten übersteigt. Überlappen die Spannweiten nicht, ist die Differenz aber kleiner, ist das ein **Hinweis**. Sonst ist der Unterschied nicht nachweisbar. Einzelläufe ohne Wiederholung sind gegen den Median von 0,037 QWK zu lesen.
 
@@ -87,22 +87,22 @@ Gleiche Saat und gleiche Softwareumgebung liefern byteweise identische Ergebniss
 
 | Benchmark | Llama-3.2-1B | Llama-3.2-3B | Mistral-7B | Encoder | Summe |
 | --- | --- | --- | --- | --- | --- |
-| [ASAP-SAS](results/asap/README.md) | 17 | 17 | 15 | 2 | **51** |
-| [Beetle](results/beetle/README.md) | 41 | 27 | 22 | 5 | **95** |
-| [SciEntsBank](results/scientsbank/README.md) | 31 | 31 | 25 | 8 | **95** |
-| [Stance Detection](results/stance/README.md) | 9 | 0 | 0 | 0 | **9** |
-| | | | | | **250** |
+| [ASAP-SAS](results/asap/README.md) | 23 | 17 | 15 | 2 | **57** |
+| [Beetle](results/beetle/README.md) | 41 | 29 | 22 | 5 | **97** |
+| [SciEntsBank](results/scientsbank/README.md) | 33 | 33 | 25 | 8 | **99** |
+| [Stance Detection](results/stance/README.md) | 9 | 9 | 0 | 0 | **18** |
+| | | | | | **271** |
 
 | Variante | ASAP | Beetle | SciEntsBank | Stance |
 | --- | --- | --- | --- | --- |
-| `condiff` (inkl. Encoder, Lernratenvarianten und Zusatzsaaten) | 11 | 24 | 19 | 3 |
+| `condiff` (inkl. Encoder, Lernratenvarianten und Zusatzsaaten) | 11 | 26 | 23 | 6 |
 | `concat` | 3 | 9 | 9 | 0 |
 | `diff` | 0 | 3 | 3 | 0 |
 | `gate` | 3 | 9 | 9 | 0 |
 | `tconcat` | 3 | 5 | 5 | 0 |
 | `bidir*` (alle Maskenstufen inkl. Wiederholungen `_v2`) | 22 | 25 | 25 | 0 |
-| `seqclass` (alle Varianten) | **0** | **20** | **25** | 6 |
-| `transfer` (Training ASAP-SAS, Test Beetle und SciEntsBank) | 9 | 0 | 0 | 0 |
-| **Summe** | **51** | **95** | **95** | **9** |
+| `seqclass` (alle Varianten) | **0** | **20** | **25** | 12 |
+| `transfer` (beide Richtungen, liegen unter `asap/`) | 15 | 0 | 0 | 0 |
+| **Summe** | **57** | **97** | **99** | **18** |
 
 Die README jedes Benchmarks erklärt jeden einzelnen Lauf: welche Frage er beantwortet, wie er gegenüber seiner Referenz abschneidet und was die Drei-Saat-Vergleiche daraus ergeben.

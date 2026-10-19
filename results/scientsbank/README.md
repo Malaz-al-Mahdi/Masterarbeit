@@ -6,7 +6,7 @@ Der einzige Benchmark mit **allen drei** Generalisierungsbedingungen. Die 46 Fra
 
 **Umfang:** 4.969 Trainingsinstanzen; UA 540, UQ 733, UD 4.562
 
-Insgesamt liegen hier **95 Trainingsläufe**.
+Insgesamt liegen hier **99 Trainingsläufe**.
 
 ## Was die Ergebnisse aussagen
 
@@ -19,7 +19,7 @@ Die folgenden Aussagen stützen sich, wo nicht anders vermerkt, auf Mittelwerte 
 - **Span-Alignment gegen festen Kopf: kleiner Vorteil nur bei 1B.** Auf UA (+0,021) und UD (+0,026) besteht der Vorteil die Auswertungsregel, liegt aber unter der Rauschgrenze; bei 3B und 7B ist kein Vorteil nachweisbar; bei 7B liegt der feste Kopf auf UD mit einem Hinweis vorn (−0,014).
 - **Die Bezugsgröße ist ohne Wirkung.** t-concat und CONCAT liegen auf allen drei Splits innerhalb ihrer Spannweiten. Mit nur der Saat 114514 hätte t-concat einen deutlichen Vorteil nahegelegt.
 - **Vollständige Bidirektionalität nützt dem größeren Backbone auf UQ.** Llama-3.2-3B gewinnt 0,060 QWK auf UQ (Effekt unter beiden Metriken); bei Llama-3.2-1B ist kein Unterschied nachweisbar, bei Mistral-7B ebenso wenig (−0,011 / −0,035 / −0,037). Dort sind die Spannweiten wegen des schwachen Laufs mit Saat 1 sehr groß (bis 0,206).
-- **Die höhere Lernrate hilft hier nicht.** Llama-3.2-1B bei 2·10⁻⁴ liegt auf UA und UD unter allen Läufen bei 5·10⁻⁵ (0,679 / 0,496 QWK). Llama-3.2-3B liegt bei 2·10⁻⁴ auf UQ über dem Bereich (+0,030), auf UD darunter (−0,041), auf UA innerhalb.
+- **Die höhere Lernrate hilft hier nicht.** Mit drei Saaten bei 2·10⁻⁴ liegt Llama-3.2-1B auf allen drei Splits nominell unter 5·10⁻⁵, auf UD mit disjunkten Spannweiten (−0,070). Llama-3.2-3B verliert auf UD als Effekt (−0,050), auf UA und UQ ist kein Unterschied nachweisbar. Auf UQ streut die höhere Rate bei beiden Größen breit (Spannweite 0,182 / 0,144). Bei passender Lernrate (Llama bei 2·10⁻⁴, Mistral-7B bei 5·10⁻⁵) bleibt hier ein Größeneffekt: Auf UD liegt Mistral-7B vor beiden Llama-Größen als Effekt (+0,151 / +0,074), auf UA vor Llama-3.2-1B (+0,055) (Kapitel 5.4.4).
 - **Encoder sind auf diesem Benchmark fragil.** BERT liegt bei jeder geprüften Lernrate auf Zufallsniveau; RoBERTa funktioniert nur bei 1·10⁻⁵ und bleibt auch dann hinter Llama-3.2-1B.
 - **Die Bibliotheksversion ändert Ergebnisse messbar.** Bei gleicher Saat weichen `_tf4576` und `_tf5161` um +0,016 / −0,014 / −0,001 QWK ab.
 
@@ -44,6 +44,8 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 | GATE, kausal | Llama-3.2-3B | 0,737 (0,030) | 0,716 (0,016) | 0,624 (0,060) | 0,664 (0,026) | 0,630 (0,011) | 0,660 (0,007) |
 | fester Kopf, Rubrik | Llama-3.2-3B | 0,746 (0,028) | 0,725 (0,021) | 0,580 (0,076) | 0,633 (0,066) | 0,641 (0,026) | 0,646 (0,011) |
 | fester Kopf, weder Rubrik noch Kontext | Llama-3.2-3B | 0,491 (0,025) | 0,573 (0,027) | 0,052 (0,063) | 0,368 (0,027) | 0,201 (0,029) | 0,385 (0,035) |
+| CONDIFF, kausal, lr 2·10⁻⁴ | Llama-3.2-1B | 0,700 (0,050) | 0,686 (0,019) | 0,484 (0,182) | 0,599 (0,123) | 0,490 (0,072) | 0,596 (0,044) |
+| CONDIFF, kausal, lr 2·10⁻⁴ | Llama-3.2-3B | 0,750 (0,010) | 0,709 (0,006) | 0,546 (0,144) | 0,636 (0,047) | 0,567 (0,006) | 0,634 (0,006) |
 | t-concat, kausal | Llama-3.2-3B | 0,734 (0,066) | 0,721 (0,039) | 0,584 (0,059) | 0,649 (0,029) | 0,615 (0,019) | 0,657 (0,013) |
 | CONDIFF, vollständig bidirektional | Mistral-7B | 0,744 (0,110) | 0,711 (0,080) | 0,604 (0,206) | 0,669 (0,120) | 0,605 (0,199) | 0,655 (0,118) |
 | CONCAT, kausal | Mistral-7B | 0,750 (0,050) | 0,720 (0,034) | 0,652 (0,046) | 0,677 (0,040) | 0,647 (0,037) | 0,670 (0,025) |
@@ -133,6 +135,12 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 | vollständig bidirektional gegen kausal (7B) | 5.4.3 | UA | −0,011 | — | −0,009 | — |
 | vollständig bidirektional gegen kausal (7B) | 5.4.3 | UQ | −0,035 | — | −0,002 | — |
 | vollständig bidirektional gegen kausal (7B) | 5.4.3 | UD | −0,037 | — | −0,007 | — |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UA | −0,002 | — | −0,006 | — |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UQ | −0,060 | — | −0,008 | — |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UD | −0,070 | Hinweis | −0,033 | Hinweis |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (3B) | 5.4.4 | UA | +0,016 | — | −0,003 | — |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (3B) | 5.4.4 | UQ | −0,030 | — | −0,009 | — |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (3B) | 5.4.4 | UD | −0,050 | **Effekt** | −0,022 | **Effekt** |
 
 ## Die Läufe im Einzelnen
 
@@ -154,7 +162,9 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `scientsbank_concat_llama1b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,685 | 0,550 | 0,588 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama1b_seed1`: UA −0,017 · UQ +0,023 · UD +0,041 → über der Rauschgrenze auf UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,698 (Δ 0,034) · UQ 0,569 (Δ 0,043) · UD 0,577 (Δ 0,025). |
 | `scientsbank_concat_llama1b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,719 | 0,593 | 0,580 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama1b_seed2`: UA +0,020 · UQ +0,070 · UD +0,019 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,698 (Δ 0,034) · UQ 0,569 (Δ 0,043) · UD 0,577 (Δ 0,025). |
 | `scientsbank_condiff_llama1b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,705 | 0,582 | 0,572 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. Drei-Saat-Mittel: UA 0,702 (Δ 0,007) · UQ 0,544 (Δ 0,058) · UD 0,560 (Δ 0,026). |
-| `scientsbank_condiff_llama1b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,679 | 0,537 | 0,496 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `scientsbank_condiff_llama1b`: UA −0,027 · UQ −0,045 · UD −0,076 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Grundlage der Aussage, dass der Größenvergleich mit der Lernrate konfundiert ist (Kapitel 5.4.4). |
+| `scientsbank_condiff_llama1b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,679 | 0,537 | 0,496 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `scientsbank_condiff_llama1b`: UA −0,027 · UQ −0,045 · UD −0,076 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,700 (Δ 0,050) · UQ 0,484 (Δ 0,182) · UD 0,490 (Δ 0,072). |
+| `scientsbank_condiff_llama1b_lr2e4_seed1` | CONDIFF, kausal | 2e-4 | 1 | 0,691 | 0,366 | 0,451 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 1. Gegenüber `scientsbank_condiff_llama1b_seed1`: UA −0,011 · UQ −0,161 · UD −0,095 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,700 (Δ 0,050) · UQ 0,484 (Δ 0,182) · UD 0,490 (Δ 0,072). |
+| `scientsbank_condiff_llama1b_lr2e4_seed2` | CONDIFF, kausal | 2e-4 | 2 | 0,729 | 0,549 | 0,523 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 2. Gegenüber `scientsbank_condiff_llama1b_seed2`: UA +0,030 · UQ +0,025 · UD −0,037 → über der Rauschgrenze auf UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,700 (Δ 0,050) · UQ 0,484 (Δ 0,182) · UD 0,490 (Δ 0,072). |
 | `scientsbank_condiff_llama1b_seed1` | CONDIFF, kausal | 5e-5 | 1 | 0,703 | 0,527 | 0,546 | Wiederholung der CONDIFF-Referenz mit Saat 1. Drei-Saat-Mittel: UA 0,702 (Δ 0,007) · UQ 0,544 (Δ 0,058) · UD 0,560 (Δ 0,026). |
 | `scientsbank_condiff_llama1b_seed2` | CONDIFF, kausal | 5e-5 | 2 | 0,698 | 0,524 | 0,561 | Wiederholung der CONDIFF-Referenz mit Saat 2. Drei-Saat-Mittel: UA 0,702 (Δ 0,007) · UQ 0,544 (Δ 0,058) · UD 0,560 (Δ 0,026). |
 | `scientsbank_gate_llama1b` ¹ | GATE, kausal | 5e-5 ¹ | 114514 | 0,737 | 0,544 | 0,584 | Fusionsmechanismus GATE (gelernte Gate-Gewichtung von z und r) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama1b`: UA +0,032 · UQ −0,038 · UD +0,012 → über der Rauschgrenze auf UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,718 (Δ 0,039) · UQ 0,564 (Δ 0,032) · UD 0,559 (Δ 0,047). |
@@ -190,7 +200,9 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `scientsbank_concat_llama3b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,701 | 0,597 | 0,644 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama3b_seed1`: UA −0,049 · UQ +0,018 · UD +0,031 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,720 (Δ 0,042) · UQ 0,582 (Δ 0,049) · UD 0,626 (Δ 0,035). |
 | `scientsbank_concat_llama3b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,743 | 0,550 | 0,624 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama3b_seed2`: UA +0,040 · UQ −0,021 · UD −0,010 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,720 (Δ 0,042) · UQ 0,582 (Δ 0,049) · UD 0,626 (Δ 0,035). |
 | `scientsbank_condiff_llama3b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,750 | 0,576 | 0,605 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. Drei-Saat-Mittel: UA 0,734 (Δ 0,047) · UQ 0,576 (Δ 0,009) · UD 0,617 (Δ 0,028). |
-| `scientsbank_condiff_llama3b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,749 | 0,609 | 0,564 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `scientsbank_condiff_llama3b`: UA ±0,000 · UQ +0,033 · UD −0,041 → über der Rauschgrenze auf UD (Einzelvergleich). Gegenüber dem Drei-Saat-Bereich bei 5·10⁻⁵: UA innerhalb, UQ darüber (+0,030), UD darunter (−0,041) (Kapitel 5.4.4). |
+| `scientsbank_condiff_llama3b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,749 | 0,609 | 0,564 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `scientsbank_condiff_llama3b`: UA ±0,000 · UQ +0,033 · UD −0,041 → über der Rauschgrenze auf UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,750 (Δ 0,010) · UQ 0,546 (Δ 0,144) · UD 0,567 (Δ 0,006). |
+| `scientsbank_condiff_llama3b_lr2e4_seed1` | CONDIFF, kausal | 2e-4 | 1 | 0,756 | 0,466 | 0,567 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 1. Gegenüber `scientsbank_condiff_llama3b_seed1`: UA +0,005 · UQ −0,114 · UD −0,046 → über der Rauschgrenze auf UQ, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,750 (Δ 0,010) · UQ 0,546 (Δ 0,144) · UD 0,567 (Δ 0,006). |
+| `scientsbank_condiff_llama3b_lr2e4_seed2` | CONDIFF, kausal | 2e-4 | 2 | 0,746 | 0,561 | 0,570 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 2. Gegenüber `scientsbank_condiff_llama3b_seed2`: UA +0,043 · UQ −0,010 · UD −0,063 → über der Rauschgrenze auf UA, UD (Einzelvergleich). Drei-Saat-Mittel: UA 0,750 (Δ 0,010) · UQ 0,546 (Δ 0,144) · UD 0,567 (Δ 0,006). |
 | `scientsbank_condiff_llama3b_seed1` | CONDIFF, kausal | 5e-5 | 1 | 0,750 | 0,580 | 0,614 | Wiederholung der CONDIFF-Referenz mit Saat 1. Drei-Saat-Mittel: UA 0,734 (Δ 0,047) · UQ 0,576 (Δ 0,009) · UD 0,617 (Δ 0,028). |
 | `scientsbank_condiff_llama3b_seed2` | CONDIFF, kausal | 5e-5 | 2 | 0,703 | 0,571 | 0,633 | Wiederholung der CONDIFF-Referenz mit Saat 2. Drei-Saat-Mittel: UA 0,734 (Δ 0,047) · UQ 0,576 (Δ 0,009) · UD 0,617 (Δ 0,028). |
 | `scientsbank_diff_llama3b` | DIFF, kausal | 5e-5 | 114514 | 0,716 | 0,559 | 0,634 | Fusionsmechanismus DIFF (Differenzterm z − r allein) statt CONDIFF, kausal. Gegenüber `scientsbank_condiff_llama3b`: UA −0,033 · UQ −0,017 · UD +0,029 → im Rauschen. Drei-Saat-Mittel: UA 0,722 (Δ 0,014) · UQ 0,579 (Δ 0,048) · UD 0,623 (Δ 0,018). |

@@ -6,7 +6,7 @@ Der einzige Benchmark mit **je Aufgabe wechselnder Stufenzahl** — vier Aufgabe
 
 **Umfang:** 17.043 Trainingsinstanzen, 5.224 im UA-Test
 
-Insgesamt liegen hier **51 Trainingsläufe**, davon 9 Transferläufe, die auf ASAP-SAS trainiert und auf Beetle und SciEntsBank getestet werden.
+Insgesamt liegen hier **57 Trainingsläufe**, davon 9 Transferläufe, die auf ASAP-SAS trainiert und auf Beetle und SciEntsBank getestet werden, und 6 Transferläufe in umgekehrter Richtung (Training auf Beetle bzw. SciEntsBank, Test auf ASAP-SAS).
 
 ## Was die Ergebnisse aussagen
 
@@ -18,7 +18,7 @@ Auf ASAP-SAS liegen die meisten Konfigurationen nur mit **einer** Zufallssaat vo
 - **Die Aufgabe entscheidet stärker als die Architektur.** Je Einzelaufgabe reicht das QWK von 0,625 bis 0,834 (Llama-3.2-1B) und von 0,653 bis 0,898 (Mistral-7B). Diese Spanne liegt um ein Vielfaches über allen Architekturunterschieden auf diesem Benchmark (Kapitel 5.5.1).
 - **Mistral-7B liegt knapp vor den Llama-Größen.** Mit drei Saaten erreicht CONDIFF 0,856 QWK gegenüber 0,827 (1B) und 0,835 (3B). Nach der Auswertungsregel ist das jeweils ein Effekt, unter beiden Metriken, aber die Differenzen liegen unter der Rauschgrenze und bestehen die Regel nur wegen der engen Streuung (Spannweiten 0,004 bis 0,016). Da die Llama-Modelle bei einem Viertel ihrer vorgesehenen Lernrate liefen, ist das kein gesicherter Größeneffekt (Kapitel 5.4.4).
 - **Encoder sind auf dem UA-Split konkurrenzfähig.** RoBERTa-base erreicht 0,821 und damit nahezu das Niveau von Llama-3.2-1B (0,827 im Mittel über drei Saaten); BERT-base liegt bei 0,788.
-- **Die Übertragung auf andere Benchmarks scheitert.** Auf ASAP-SAS trainiert, erreichen alle drei Backbones auf Beetle und SciEntsBank nur Zufallsniveau (QWK im Mittel −0,017 bis 0,022, unter beiden Metriken ein Effekt gegenüber den In-Domain-Läufen). Alle Modelle ordnen nahezu jede Antwort der untersten Stufe zu. Mit den Daten vereinbar ist die Hypothese, dass die Modelle auf ASAP-SAS die Antwortlänge als Hinweis auf die Stufe gelernt haben; die Antworten der Zielbenchmarks sind durchweg kurz (Kapitel 5.3.4).
+- **Die Übertragung auf andere Benchmarks scheitert.** Auf ASAP-SAS trainiert, erreichen alle drei Backbones auf Beetle und SciEntsBank nur Zufallsniveau (QWK im Mittel −0,017 bis 0,022, unter beiden Metriken ein Effekt gegenüber den In-Domain-Läufen). Alle Modelle ordnen nahezu jede Antwort der untersten Stufe zu. Auch in umgekehrter Richtung scheitert die Übertragung: Llama-3.2-1B, nur auf Beetle bzw. SciEntsBank trainiert, erreicht auf ASAP-SAS im Mittel −0,020 bzw. 0,157 QWK (In-Domain 0,827), mit einer Accuracy auf Höhe oder unter der Mehrheitsschranke. Mit den Daten vereinbar ist die Hypothese, dass die Modelle auf ASAP-SAS die Antwortlänge als Hinweis auf die Stufe gelernt haben; die Antworten der Zielbenchmarks sind durchweg kurz (Kapitel 5.3.4).
 
 ### Drei-Saat-Gruppen
 
@@ -53,6 +53,8 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern.
 | Transfer gegen In-Domain (7B) | 5.3.4 | SciEntsBank UA | −0,738 | **Effekt** | −0,534 | **Effekt** |
 | Transfer gegen In-Domain (7B) | 5.3.4 | SciEntsBank UQ | −0,635 | **Effekt** | −0,487 | **Effekt** |
 | Transfer gegen In-Domain (7B) | 5.3.4 | SciEntsBank UD | −0,630 | **Effekt** | −0,476 | **Effekt** |
+| Transfer Beetle → ASAP-SAS gegen In-Domain (1B) | 5.3.4 | UA | −0,846 | **Effekt** | −0,555 | **Effekt** |
+| Transfer SciEntsBank → ASAP-SAS gegen In-Domain (1B) | 5.3.4 | UA | −0,670 | **Effekt** | −0,464 | **Effekt** |
 | vollständig bidirektional gegen kausal (1B) | 5.4.3 | UA | +0,003 | — | +0,010 | — |
 | vollständig bidirektional gegen kausal (3B) | 5.4.3 | UA | +0,001 | — | +0,005 | — |
 
@@ -137,6 +139,19 @@ Die Werte sind QWK auf den Testsplits der Zielbenchmarks; die Dateien in `predic
 | `transfer_asap_condiff_mistral7b_seed1` | Mistral-7B | 1 | −0,000 | −0,001 | 0,016 | 0,002 | 0,008 | Training nur auf ASAP-SAS, Test ohne weiteres Training mit den Rubriken des Zielbenchmarks. 98,0 bis 99,9 % der Antworten werden der untersten Stufe zugeordnet; QWK auf Zufallsniveau (Kapitel 5.3.4). |
 | `transfer_asap_condiff_mistral7b_seed2` | Mistral-7B | 2 | 0,000 | 0,001 | 0,021 | −0,001 | 0,009 | Training nur auf ASAP-SAS, Test ohne weiteres Training mit den Rubriken des Zielbenchmarks. 97,0 bis 100,0 % der Antworten werden der untersten Stufe zugeordnet; QWK auf Zufallsniveau (Kapitel 5.3.4). |
 
+### Transferläufe in umgekehrter Richtung (Training Beetle bzw. SciEntsBank, Test ASAP-SAS)
+
+Die Werte sind QWK auf dem UA-Split von ASAP-SAS; die Dateien in `predictions/` tragen das Präfix `asap_sas_`.
+
+| Lauf | Training | Saat | ASAP-SAS UA | Was der Lauf zeigt |
+| --- | --- | --- | --- | --- |
+| `transfer_beetle_condiff_llama1b` | Beetle | 114514 | 0,060 | Training nur auf Beetle, Test ohne weiteres Training auf ASAP-SAS mit dessen Rubriken. 89.4 % der Antworten werden der untersten Stufe zugeordnet; Accuracy 0,399 gegenüber einer Mehrheitsschranke von 0,393 (Kapitel 5.3.4). |
+| `transfer_beetle_condiff_llama1b_seed1` | Beetle | 1 | −0,166 | Training nur auf Beetle, Test ohne weiteres Training auf ASAP-SAS mit dessen Rubriken. 52.0 % der Antworten werden der untersten Stufe zugeordnet; Accuracy 0,275 gegenüber einer Mehrheitsschranke von 0,393 (Kapitel 5.3.4). |
+| `transfer_beetle_condiff_llama1b_seed2` | Beetle | 2 | 0,046 | Training nur auf Beetle, Test ohne weiteres Training auf ASAP-SAS mit dessen Rubriken. 89.8 % der Antworten werden der untersten Stufe zugeordnet; Accuracy 0,388 gegenüber einer Mehrheitsschranke von 0,393 (Kapitel 5.3.4). |
+| `transfer_scientsbank_condiff_llama1b` | SciEntsBank | 114514 | 0,043 | Training nur auf SciEntsBank, Test ohne weiteres Training auf ASAP-SAS mit dessen Rubriken. 29.9 % der Antworten werden der untersten Stufe zugeordnet; Accuracy 0,320 gegenüber einer Mehrheitsschranke von 0,393 (Kapitel 5.3.4). |
+| `transfer_scientsbank_condiff_llama1b_seed1` | SciEntsBank | 1 | 0,270 | Training nur auf SciEntsBank, Test ohne weiteres Training auf ASAP-SAS mit dessen Rubriken. 18.5 % der Antworten werden der untersten Stufe zugeordnet; Accuracy 0,382 gegenüber einer Mehrheitsschranke von 0,393 (Kapitel 5.3.4). |
+| `transfer_scientsbank_condiff_llama1b_seed2` | SciEntsBank | 2 | 0,157 | Training nur auf SciEntsBank, Test ohne weiteres Training auf ASAP-SAS mit dessen Rubriken. 28.2 % der Antworten werden der untersten Stufe zugeordnet; Accuracy 0,371 gegenüber einer Mehrheitsschranke von 0,393 (Kapitel 5.3.4). |
+
 ### RoBERTa-base
 
 | Lauf | Konfiguration | lr | Saat | UA | Was der Lauf zeigt |
@@ -192,6 +207,7 @@ Läufe der ersten Trainingswelle haben **keine** `config.json` und `training_arg
 | `_tf4576`, `_tf5161` | Bibliotheksversion (transformers 4.57.6 bzw. 5.16.1) — nur dort vergeben, wo zwei Läufe sonst denselben Namen trügen |
 | `_v2` | Wiederholung desselben Laufs mit derselben Saat: zur Prüfung der Reproduzierbarkeit oder, bei Mistral-7B, eines instabilen Laufs |
 | `transfer_asap_condiff_*` | Training ausschließlich auf ASAP-SAS, Test auf Beetle und SciEntsBank (liegt unter `asap/`) |
+| `transfer_beetle_condiff_*`, `transfer_scientsbank_condiff_*` | umgekehrte Richtung: Training auf Beetle bzw. SciEntsBank, Test auf ASAP-SAS |
 
 ## Bekannte Einschränkungen
 

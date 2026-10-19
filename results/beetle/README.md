@@ -6,7 +6,7 @@ Erklärungs- und Definitionsfragen aus der elementaren Elektrizitätslehre — e
 
 **Umfang:** 3.941 Trainingsinstanzen; UA 439, UQ 819
 
-Insgesamt liegen hier **95 Trainingsläufe**.
+Insgesamt liegen hier **97 Trainingsläufe**.
 
 ## Was die Ergebnisse aussagen
 
@@ -18,7 +18,7 @@ Die folgenden Aussagen stützen sich, wo nicht anders vermerkt, auf Mittelwerte 
 - **Die Fusionsmechanismen sind nicht zu unterscheiden** — auf keinem der drei Backbones. Unter QWK ist kein Unterschied zwischen CONDIFF, CONCAT, DIFF und GATE als Effekt nachweisbar. Einzige Ausnahme unter Macro-F1: GATE liegt auf Llama-3.2-3B auf UA vor DIFF, um nur 0,009. Bei Mistral-7B liegen die drei Varianten auf UA im Mittel nur 0,008 QWK auseinander; der einzige Hinweis (CONDIFF vor GATE auf UQ) entfällt unter Macro-F1.
 - **Der Antwort-Span als Bezugsgröße bringt höchstens wenig.** t-concat liegt auf UA 0,026 QWK vor CONCAT (Hinweis; unter Macro-F1 knapp ein Effekt), auf UQ gleichauf.
 - **Vollständige Bidirektionalität schadet den größeren Backbones.** Llama-3.2-3B verliert 0,073 QWK auf UA und 0,186 auf UQ, Mistral-7B 0,089 auf UQ (Effekt unter beiden Metriken); auf UA ist bei Mistral-7B unter QWK kein Unterschied nachweisbar (+0,023), unter Macro-F1 ein kleiner Gewinn (+0,017, Effekt). Der Gewinn von Llama-3.2-1B auf UA (+0,036 mit drei Saaten) hält der Erweiterung der kausalen Referenz auf acht Saaten nicht stand (+0,033, nicht nachweisbar); auf UQ verliert es unter Macro-F1 (−0,041, auch mit acht Saaten ein Effekt).
-- **Die höhere Lernrate bringt keinen gesicherten Gewinn.** Ein Einzellauf von Llama-3.2-1B bei 2·10⁻⁴ (Saat 114514) erreichte 0,779 / 0,605 QWK und schien den Abstand zu Mistral-7B vollständig zu schließen. Mit drei Saaten liegt das Mittel bei 0,766 / 0,551, also nur +0,036 / +0,042 über 5·10⁻⁵ — wegen der stark wachsenden Streuung (Spannweite 0,071 / 0,097) nicht nachweisbar, unter keiner der beiden Metriken. Gegenüber Mistral-7B ist der Abstand bei 5·10⁻⁵ ein Effekt (0,050 / 0,095), bei 2·10⁻⁴ nicht mehr nachweisbar (0,013 / 0,053). Für Llama-3.2-3B liegt bei 2·10⁻⁴ nur ein Einzellauf vor: UA +0,027 über dem Bereich, UQ innerhalb.
+- **Die höhere Lernrate bringt keinen durchgängigen Gewinn.** Ein Einzellauf von Llama-3.2-1B bei 2·10⁻⁴ (Saat 114514) erreichte 0,779 / 0,605 QWK und schien den Abstand zu Mistral-7B vollständig zu schließen. Mit drei Saaten liegt das Mittel bei 0,766 / 0,551, also nur +0,036 / +0,042 über 5·10⁻⁵ und wegen der stark wachsenden Streuung (Spannweite 0,071 / 0,097) nicht nachweisbar. Llama-3.2-3B gewinnt bei 2·10⁻⁴ auf UA als Effekt (+0,042), auf UQ ist kein Unterschied nachweisbar. Bei passender Lernrate (Llama bei 2·10⁻⁴, Mistral-7B bei 5·10⁻⁵) liegt Mistral-7B auf Beetle vor keiner der beiden Llama-Größen nachweisbar vorn (Kapitel 5.4.4).
 - **Drei Saaten können die Streuung unterschätzen.** Über acht Saaten beträgt die Spannweite von CONDIFF mit Llama-3.2-1B auf UA 0,079 statt 0,023 bei den drei ursprünglichen; der Median aller 56 Dreiergruppen (0,039 / 0,034) bestätigt dagegen die Rauschgrenze von 0,037 (Kapitel 5.2).
 - **RoBERTa bricht auf UQ ein, bei jeder Lernrate.** Auf UA erreicht es bis zu 0,768, auf UQ nur 0,288 bis 0,362, gegenüber 0,509 für Llama-3.2-1B.
 - **Training ist reproduzierbar.** Die beiden `_seed114514_v2`-Läufe stimmen exakt mit ihren Originalen überein.
@@ -46,6 +46,7 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | GATE, kausal | Llama-3.2-3B | 0,757 (0,022) | 0,743 (0,006) | 0,550 (0,044) | 0,608 (0,021) |
 | t-concat, kausal | Llama-3.2-3B | 0,761 (0,006) | 0,750 (0,004) | 0,552 (0,019) | 0,602 (0,014) |
 | fester Kopf, Rubrik | Llama-3.2-3B | 0,722 (0,081) | 0,720 (0,032) | 0,517 (0,089) | 0,578 (0,055) |
+| CONDIFF, kausal, lr 2·10⁻⁴ | Llama-3.2-3B | 0,772 (0,030) | 0,760 (0,030) | 0,573 (0,067) | 0,622 (0,017) |
 | CONDIFF, vollständig bidirektional | Mistral-7B | 0,802 (0,011) | 0,783 (0,007) | 0,515 (0,038) | 0,571 (0,030) |
 | CONCAT, kausal | Mistral-7B | 0,772 (0,037) | 0,757 (0,041) | 0,604 (0,058) | 0,632 (0,024) |
 | CONDIFF, kausal | Mistral-7B | 0,779 (0,046) | 0,766 (0,009) | 0,605 (0,007) | 0,628 (0,008) |
@@ -112,6 +113,8 @@ Mittelwert über drei Zufallssaaten, Spannweite in Klammern; die Zeile „acht S
 | vollständig bidirektional gegen kausal (1B, acht Saaten) | 5.4.3 | UQ | −0,032 | — | −0,038 | **Effekt** |
 | lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UA | +0,036 | — | +0,013 | — |
 | lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (1B) | 5.4.4 | UQ | +0,042 | — | ±0,000 | — |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (3B) | 5.4.4 | UA | +0,042 | **Effekt** | +0,035 | **Effekt** |
+| lr 2·10⁻⁴ gegen 5·10⁻⁵, CONDIFF (3B) | 5.4.4 | UQ | +0,029 | — | +0,026 | Hinweis |
 
 ## Die Läufe im Einzelnen
 
@@ -179,7 +182,9 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | `beetle_concat_llama3b_seed1` | CONCAT, kausal | 5e-5 | 1 | 0,709 | 0,525 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama3b_seed1`: UA −0,026 · UQ −0,004 → im Rauschen. Drei-Saat-Mittel: UA 0,735 (Δ 0,042) · UQ 0,546 (Δ 0,046). |
 | `beetle_concat_llama3b_seed2` | CONCAT, kausal | 5e-5 | 2 | 0,751 | 0,544 | Fusionsmechanismus CONCAT (Konkatenation [z ‖ r] ohne Differenzterm) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama3b_seed2`: UA +0,044 · UQ +0,013 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,735 (Δ 0,042) · UQ 0,546 (Δ 0,046). |
 | `beetle_condiff_llama3b` ¹ | CONDIFF, kausal | 5e-5 ¹ | 114514 | 0,748 | 0,573 | Referenzbedingung: Span-Alignment mit CONDIFF und kausaler Maske. Vergleichsbasis für Fusion, Maske und festen Kopf. Drei-Saat-Mittel: UA 0,730 (Δ 0,041) · UQ 0,544 (Δ 0,044). |
-| `beetle_condiff_llama3b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,775 | 0,564 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `beetle_condiff_llama3b`: UA +0,027 · UQ −0,009 → im Rauschen. Gegenüber dem Drei-Saat-Bereich bei 5·10⁻⁵: UA darüber (+0,027), UQ innerhalb (Kapitel 5.4.4). |
+| `beetle_condiff_llama3b_lr2e4` | CONDIFF, kausal | 2e-4 | 114514 | 0,775 | 0,564 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵. Gegenüber `beetle_condiff_llama3b`: UA +0,027 · UQ −0,009 → im Rauschen. Drei-Saat-Mittel: UA 0,772 (Δ 0,030) · UQ 0,573 (Δ 0,067). |
+| `beetle_condiff_llama3b_lr2e4_seed1` | CONDIFF, kausal | 2e-4 | 1 | 0,786 | 0,543 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 1. Gegenüber `beetle_condiff_llama3b_seed1`: UA +0,050 · UQ +0,015 → über der Rauschgrenze auf UA (Einzelvergleich). Drei-Saat-Mittel: UA 0,772 (Δ 0,030) · UQ 0,573 (Δ 0,067). |
+| `beetle_condiff_llama3b_lr2e4_seed2` | CONDIFF, kausal | 2e-4 | 2 | 0,755 | 0,610 | Lernrate 2·10⁻⁴ (Referenzwert der Implementierung für dieses Backbone) statt 5·10⁻⁵, Wiederholung mit Saat 2. Gegenüber `beetle_condiff_llama3b_seed2`: UA +0,048 · UQ +0,080 → über der Rauschgrenze auf UA, UQ (Einzelvergleich). Drei-Saat-Mittel: UA 0,772 (Δ 0,030) · UQ 0,573 (Δ 0,067). |
 | `beetle_condiff_llama3b_seed1` | CONDIFF, kausal | 5e-5 | 1 | 0,735 | 0,528 | Wiederholung der CONDIFF-Referenz mit Saat 1. Drei-Saat-Mittel: UA 0,730 (Δ 0,041) · UQ 0,544 (Δ 0,044). |
 | `beetle_condiff_llama3b_seed2` | CONDIFF, kausal | 5e-5 | 2 | 0,707 | 0,531 | Wiederholung der CONDIFF-Referenz mit Saat 2. Drei-Saat-Mittel: UA 0,730 (Δ 0,041) · UQ 0,544 (Δ 0,044). |
 | `beetle_diff_llama3b` | DIFF, kausal | 5e-5 | 114514 | 0,734 | 0,552 | Fusionsmechanismus DIFF (Differenzterm z − r allein) statt CONDIFF, kausal. Gegenüber `beetle_condiff_llama3b`: UA −0,014 · UQ −0,021 → im Rauschen. Drei-Saat-Mittel: UA 0,740 (Δ 0,010) · UQ 0,572 (Δ 0,048). |
