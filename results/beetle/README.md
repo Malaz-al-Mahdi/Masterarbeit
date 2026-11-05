@@ -6,7 +6,7 @@ Erklärungs- und Definitionsfragen aus der elementaren Elektrizitätslehre — e
 
 **Umfang:** 3.941 Trainingsinstanzen; UA 439, UQ 819
 
-Insgesamt liegen hier **97 Trainingsläufe**.
+Insgesamt liegen hier **100 Trainingsläufe**.
 
 ## Was die Ergebnisse aussagen
 
@@ -20,7 +20,7 @@ Die folgenden Aussagen stützen sich, wo nicht anders vermerkt, auf Mittelwerte 
 - **Vollständige Bidirektionalität schadet den größeren Backbones.** Llama-3.2-3B verliert 0,073 QWK auf UA und 0,186 auf UQ, Mistral-7B 0,089 auf UQ (Effekt unter beiden Metriken); auf UA ist bei Mistral-7B unter QWK kein Unterschied nachweisbar (+0,023), unter Macro-F1 ein kleiner Gewinn (+0,017, Effekt). Der Gewinn von Llama-3.2-1B auf UA (+0,036 mit drei Saaten) hält der Erweiterung der kausalen Referenz auf acht Saaten nicht stand (+0,033, nicht nachweisbar); auf UQ verliert es unter Macro-F1 (−0,041, auch mit acht Saaten ein Effekt).
 - **Die höhere Lernrate bringt keinen durchgängigen Gewinn.** Ein Einzellauf von Llama-3.2-1B bei 2·10⁻⁴ (Saat 114514) erreichte 0,779 / 0,605 QWK und schien den Abstand zu Mistral-7B vollständig zu schließen. Mit drei Saaten liegt das Mittel bei 0,766 / 0,551, also nur +0,036 / +0,042 über 5·10⁻⁵ und wegen der stark wachsenden Streuung (Spannweite 0,071 / 0,097) nicht nachweisbar. Llama-3.2-3B gewinnt bei 2·10⁻⁴ auf UA als Effekt (+0,042), auf UQ ist kein Unterschied nachweisbar. Mit Llama bei 2·10⁻⁴ und Mistral-7B bei 5·10⁻⁵ liegt Mistral-7B auf Beetle vor keiner der beiden Llama-Größen nachweisbar vorn (Kapitel 5.4.4).
 - **Drei Saaten können die Streuung unterschätzen.** Über acht Saaten beträgt die Spannweite von CONDIFF mit Llama-3.2-1B auf UA 0,079 statt 0,023 bei den drei ursprünglichen; der Median aller 56 Dreiergruppen (0,039 / 0,034) bestätigt dagegen die Rauschgrenze von 0,037 (Kapitel 5.2).
-- **RoBERTa bricht auf UQ ein, bei jeder Lernrate.** Auf UA erreicht es bis zu 0,768, auf UQ nur 0,288 bis 0,362, gegenüber 0,509 für Llama-3.2-1B.
+- **RoBERTa bricht auf UQ ein, bei jeder Lernrate.** Auf UA erreicht es bis zu 0,768, auf UQ nur 0,288 bis 0,362, gegenüber 0,509 für Llama-3.2-1B. Auch BERT fällt auf UQ bei jeder Lernrate ab (0,034 bis 0,359).
 - **Training ist reproduzierbar.** Die beiden `_seed114514_v2`-Läufe stimmen exakt mit ihren Originalen überein.
 
 ### Drei-Saat-Gruppen
@@ -241,6 +241,9 @@ Jede Zeile ist ein Trainingslauf. Die Werte sind QWK auf dem jeweiligen Testspli
 | Lauf | Konfiguration | lr | Saat | UA | UQ | Was der Lauf zeigt |
 | --- | --- | --- | --- | --- | --- | --- |
 | `beetle_condiff_bert` ¹ | CONDIFF, kausal | ? ¹ | 114514 | 0,478 | --- | Encoder-Baseline (Hauptlauf, erste Trainingswelle, Lernrate nicht dokumentiert). Gegenüber Llama-3.2-1B `beetle_condiff_llama1b`: UA −0,219 → über der Rauschgrenze auf UA (Einzelvergleich). |
+| `beetle_condiff_bert_batch16_lr1e5` | CONDIFF, kausal | 1e-5 | 114514 | 0,577 | 0,256 | Lernratenvariation des Encoders: Lernrate 1·10⁻⁵, Batchgröße 16, Eingaben auf 512 Token gekürzt (betrifft 200 UQ-Instanzen). Gegenüber dem Encoder-Hauptlauf: UA +0,099. Gegenüber Llama-3.2-1B: UA −0,119 · UQ −0,276. |
+| `beetle_condiff_bert_batch16_lr2e5` | CONDIFF, kausal | 2e-5 | 114514 | 0,274 | 0,034 | Lernratenvariation des Encoders: Lernrate 2·10⁻⁵, Batchgröße 16, Eingaben auf 512 Token gekürzt (betrifft 200 UQ-Instanzen). Gegenüber dem Encoder-Hauptlauf: UA −0,204. Gegenüber Llama-3.2-1B: UA −0,423 · UQ −0,498. |
+| `beetle_condiff_bert_batch16_lr5e5` | CONDIFF, kausal | 5e-5 | 114514 | 0,649 | 0,359 | Lernratenvariation des Encoders: Lernrate 5·10⁻⁵, Batchgröße 16, Eingaben auf 512 Token gekürzt (betrifft 200 UQ-Instanzen). Gegenüber dem Encoder-Hauptlauf: UA +0,172. Gegenüber Llama-3.2-1B: UA −0,047 · UQ −0,173. |
 
 ¹ Erste Trainingswelle ohne `config.json` und `training_args.json`; Konfiguration aus dem Ordnernamen abgeleitet. Bei den Decoder-Läufen war die Lernrate durchgängig 5·10⁻⁵; bei den Encoder-Hauptläufen ist sie nicht dokumentiert (?).
 
@@ -290,5 +293,5 @@ Läufe der ersten Trainingswelle haben **keine** `config.json` und `training_arg
 
 - **`beetle_bidir02_mistral7b`** erreicht nur 0,587 (UA) und 0,210 (UQ). Der Lauf ist funktionsfähig, aber instabil trainiert und von der Deutung ausgenommen. Die Wiederholung `_v2` erreicht 0,778 / 0,593; ob Umgebung oder Zufall den Einbruch verursacht hat, ist nicht trennbar, ein Maskeneffekt ist es nicht.
 - **`beetle_bidir04_mistral7b`** erreicht nur 0,660 (UA) und 0,275 (UQ), mit demselben Muster wie `bidir02`: Alle Stufen werden vorhergesagt, die Leistung liegt aber weit unter den übrigen Mistral-Bedingungen. Da das Training in dieser Umgebung deterministisch ist, würde eine Wiederholung mit derselben Saat dasselbe Ergebnis liefern (Kapitel 5.5.2).
-- **BERT liegt nur für UA vor.**
+- **Der BERT-Hauptlauf liegt nur für UA vor.** UQ liefern die drei Läufe der Lernratenvariation. Bei BERT sind 200 der 819 UQ-Instanzen (Fragen PC.Q11 und SC.Q1) länger als 512 Token und werden am Ende gekürzt, wo die Rubriktexte stehen (Kapitel 4.7).
 - **Gemischte Softwareumgebungen:** In mehreren Drei-Saat-Gruppen stammt der Lauf mit Saat 114514 aus einer anderen Umgebung als die Saaten 1 und 2. Für `beetle_condiff_llama1b` wird deshalb `_seed114514_verified` verwendet. Details in Kapitel 5.2 der Arbeit.

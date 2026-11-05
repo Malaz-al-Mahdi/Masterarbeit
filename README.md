@@ -1,6 +1,6 @@
 # Span-based Classifier for Short Answer Scoring and Beyond
 
-Dieses Repository enthält die Arbeit als PDF (deutsche und englische Fassung) und die Ergebnisse **aller 273 Trainingsläufe**, auf denen Kapitel 5 beruht.
+Dieses Repository enthält die Arbeit als PDF (deutsche und englische Fassung) und die Ergebnisse **aller 276 Trainingsläufe**, auf denen Kapitel 5 beruht.
 
 ## Inhalt
 
@@ -10,7 +10,7 @@ main_en.pdf              Die Masterarbeit (englische Fassung)
 results/
 ├── alle_metriken.csv    QWK, Macro-F1 und Accuracy aller Läufe und Splits in einer Tabelle
 ├── asap/                 59 Läufe, ASAP-SAS, inkl. 15 Transferläufe (README mit Erklärung jedes Laufs)
-├── beetle/               97 Läufe, Beetle (README mit Erklärung jedes Laufs)
+├── beetle/              100 Läufe, Beetle (README mit Erklärung jedes Laufs)
 ├── scientsbank/          99 Läufe, SciEntsBank (README mit Erklärung jedes Laufs)
 ├── stance/               18 Läufe, Stance Detection, SemEval-2016 Task 6 (RQ3)
 └── logs/                 Trainingslogs und Softwareversionen der Nachtrainings
@@ -88,14 +88,14 @@ Gleiche Saat und gleiche Softwareumgebung liefern byteweise identische Ergebniss
 | Benchmark | Llama-3.2-1B | Llama-3.2-3B | Mistral-7B | Encoder | Summe |
 | --- | --- | --- | --- | --- | --- |
 | [ASAP-SAS](results/asap/README.md) | 23 | 17 | 17 | 2 | **59** |
-| [Beetle](results/beetle/README.md) | 41 | 29 | 22 | 5 | **97** |
+| [Beetle](results/beetle/README.md) | 41 | 29 | 22 | 8 | **100** |
 | [SciEntsBank](results/scientsbank/README.md) | 33 | 33 | 25 | 8 | **99** |
 | [Stance Detection](results/stance/README.md) | 9 | 9 | 0 | 0 | **18** |
-| | | | | | **273** |
+| | | | | | **276** |
 
 | Variante | ASAP | Beetle | SciEntsBank | Stance |
 | --- | --- | --- | --- | --- |
-| `condiff` (inkl. Encoder, Lernratenvarianten und Zusatzsaaten) | 11 | 26 | 23 | 6 |
+| `condiff` (inkl. Encoder, Lernratenvarianten und Zusatzsaaten) | 11 | 29 | 23 | 6 |
 | `concat` | 3 | 9 | 9 | 0 |
 | `diff` | 0 | 3 | 3 | 0 |
 | `gate` | 3 | 9 | 9 | 0 |
@@ -103,6 +103,6 @@ Gleiche Saat und gleiche Softwareumgebung liefern byteweise identische Ergebniss
 | `bidir*` (alle Maskenstufen inkl. Wiederholungen `_v2`) | 24 | 25 | 25 | 0 |
 | `seqclass` (alle Varianten) | **0** | **20** | **25** | 12 |
 | `transfer` (beide Richtungen, liegen unter `asap/`) | 15 | 0 | 0 | 0 |
-| **Summe** | **59** | **97** | **99** | **18** |
+| **Summe** | **59** | **100** | **99** | **18** |
 
 Die README jedes Benchmarks erklärt jeden einzelnen Lauf: welche Frage er beantwortet, wie er gegenüber seiner Referenz abschneidet und was die Drei-Saat-Vergleiche daraus ergeben.
